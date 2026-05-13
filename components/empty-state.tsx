@@ -1,11 +1,11 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { FileQuestion, Inbox, Search, AlertCircle } from 'lucide-react'
+import { FileQuestion, Inbox, Search, AlertCircle, Bell, BookOpen, Megaphone, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface EmptyStateProps {
-  icon?: 'inbox' | 'search' | 'file' | 'alert'
+  icon?: 'inbox' | 'search' | 'file' | 'alert' | 'bell' | 'book' | 'megaphone' | 'check'
   title: string
   description?: string
   action?: {
@@ -20,6 +20,10 @@ const icons = {
   search: Search,
   file: FileQuestion,
   alert: AlertCircle,
+  bell: Bell,
+  book: BookOpen,
+  megaphone: Megaphone,
+  check: CheckCircle,
 }
 
 export function EmptyState({

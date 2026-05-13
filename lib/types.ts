@@ -29,13 +29,18 @@ export interface Department {
   facultyId: string
 }
 
+export type AnnouncementCategory = 'all' | 'exams' | 'registration' | 'scholarships' | 'events' | 'general'
+
 export interface Announcement {
   id: string
   title: string
   content: string
-  author: User
-  category: 'academic' | 'administrative' | 'event' | 'general'
+  excerpt?: string
+  author: string
+  department: string
+  category: AnnouncementCategory
   priority: 'low' | 'medium' | 'high' | 'urgent'
+  isBookmarked?: boolean
   createdAt: Date
   expiresAt?: Date
 }
@@ -76,12 +81,41 @@ export interface LostFoundItem {
   createdAt: Date
 }
 
+export type NotificationType = 'academic' | 'administrative' | 'event' | 'scholarship' | 'system'
+
 export interface Notification {
   id: string
   title: string
   message: string
-  type: 'announcement' | 'event' | 'complaint' | 'system'
+  type: NotificationType
   read: boolean
   userId: string
   createdAt: Date
+}
+
+export interface Course {
+  id: string
+  code: string
+  title: string
+  lecturer: string
+  credits: number
+  updateCount: number
+}
+
+export interface CourseUpdate {
+  id: string
+  courseId: string
+  type: 'assignment' | 'material' | 'schedule' | 'quiz' | 'announcement'
+  title: string
+  description: string
+  dueDate?: Date
+  createdAt: Date
+}
+
+export interface SearchResult {
+  id: string
+  type: 'announcement' | 'course' | 'event' | 'notification'
+  title: string
+  description: string
+  url: string
 }

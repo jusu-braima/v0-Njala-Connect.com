@@ -1,72 +1,27 @@
 'use client'
 
-import { DashboardHeader } from '@/components/dashboard-header'
+import { useState, useMemo, useEffect } from 'react'
 import { BottomNav } from '@/components/bottom-nav'
+import { CategoryTabs } from '@/components/category-tabs'
+import { AnnouncementCard } from '@/components/announcement-card'
+import { SearchBar } from '@/components/search-bar'
 import { EmptyState } from '@/components/empty-state'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
+import { SkeletonList } from '@/components/skeleton-cards'
+import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
-import { Clock } from 'lucide-react'
-
-// Mock data for announcements
-const mockAnnouncements = [
-  {
-    id: '1',
-    title: 'Examination Timetable Released',
-    content: 'The first semester examination timetable has been published. Please check the academic portal for details.',
-    category: 'academic',
-    priority: 'high',
-    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-  },
-  {
-    id: '2',
-    title: 'Library Extended Hours',
-    content: 'During examination period, the library will remain open until 10 PM.',
-    category: 'administrative',
-    priority: 'medium',
-    createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000),
-  },
-  {
-    id: '3',
-    title: 'Student Union Elections',
-    content: 'Student Union elections will be held on December 15th. Nominations are now open.',
-    category: 'event',
-    priority: 'low',
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
-  },
-]
-
-const priorityColors = {
-  urgent: 'bg-destructive text-destructive-foreground',
-  high: 'bg-amber-500 text-white',
-  medium: 'bg-primary text-primary-foreground',
-  low: 'bg-muted text-muted-foreground',
-}
-
-const categoryLabels = {
-  academic: 'Academic',
-  administrative: 'Administrative',
-  event: 'Event',
-  general: 'General',
-}
-
-function formatTimeAgo(date: Date): string {
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
-  const diffDays = Math.floor(diffHours / 24)
-
-  if (diffHours < 1) return 'Just now'
-  if (diffHours < 24) return `${diffHours}h ago`
-  if (diffDays === 1) return 'Yesterday'
-  return `${diffDays}d ago`
-}
+import { mockAnnouncements, announcementCategories } from '@/lib/data'
+import { AnnouncementCategory } from '@/lib/types'
+import { Search, SlidersHorizontal, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 export default function AnnouncementsPage() {
   const { isAuthenticated } = useAuth()
   const router = useRouter()
+  const [activeCategory, setActiveCategory] = useState<string>('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
+  const [showSearch, setShowSearch] = useState(false)
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -74,55 +29,146 @@ export default function AnnouncementsPage() {
     }
   }, [isAuthenticated, router])
 
+  // Simulate loading
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800)
+    return () => clearTimeout(timer)
+  }, [])
+
+  const filteredAnnouncements = useMemo(() => {
+    let filtered = mockAnnouncements
+
+    // Filter by category
+    if (activeCategory !== 'all') {
+      filtered = filtered.filter(a => a.category === activeCategory)
+    }
+
+    // Filter by search
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase()
+      filtered = filtered.filter(
+        a =>
+          a.title.toLowerCase().includes(query) ||
+          a.content.toLowerCase().includes(query) ||
+          a.department.toLowerCase().includes(query)
+      )
+    }
+
+    return filtered
+  }, [activeCategory, searchQuery])
+
+  const handleBookmark = (id: string) => {
+    // TODO: Implement bookmark functionality
+    console.log('Bookmark:', id)
+  }
+
+  const handleShare = (id: string) => {
+    // TODO: Implement share functionality
+    if (navigator.share) {
+      navigator.share({
+        title: 'Announcement',
+        url: `/announcements/${id}`,
+      })
+    }
+  }
+
+  const unreadCount = 3 // Mock unread count
+
   if (!isAuthenticated) {
     return null
   }
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <DashboardHeader notificationCount={8} />
-
-      <main className="px-4 py-6 max-w-lg mx-auto">
-        <div className="mb-6">
-          <h1 className="text-xl font-bold text-foreground">Announcements</h1>
-          <p className="text-sm text-muted-foreground">Stay updated with campus news</p>
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+        <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
+          {showSearch ? (
+            <div className="flex items-center gap-2 w-full">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  setShowSearch(false)
+                  setSearchQuery('')
+                }}
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Button>
+              <SearchBar
+                placeholder="Search announcements..."
+                value={searchQuery}
+                onChange={setSearchQuery}
+                className="flex-1"
+                recentSearches={['Examination', 'Registration', 'Scholarship']}
+                suggestions={['Exam timetable', 'Course registration', 'Library hours']}
+              />
+            </div>
+          ) : (
+            <>
+              <div>
+                <h1 className="text-xl font-bold text-foreground">Announcements</h1>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button variant="ghost" size="icon" onClick={() => setShowSearch(true)}>
+                  <Search className="w-5 h-5" />
+                </Button>
+                <Button variant="ghost" size="icon">
+                  <SlidersHorizontal className="w-5 h-5" />
+                </Button>
+              </div>
+            </>
+          )}
         </div>
 
-        {mockAnnouncements.length > 0 ? (
+        {/* Category Tabs */}
+        {!showSearch && (
+          <div className="px-4 pb-3 max-w-lg mx-auto">
+            <CategoryTabs
+              categories={announcementCategories}
+              activeCategory={activeCategory}
+              onCategoryChange={setActiveCategory}
+            />
+          </div>
+        )}
+      </header>
+
+      <main className="px-4 py-4 max-w-lg mx-auto">
+        {isLoading ? (
+          <SkeletonList variant="announcement" count={4} />
+        ) : filteredAnnouncements.length > 0 ? (
           <div className="space-y-3">
-            {mockAnnouncements.map((announcement) => (
-              <Card key={announcement.id} className="overflow-hidden">
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <Badge variant="secondary" className="text-xs">
-                        {categoryLabels[announcement.category as keyof typeof categoryLabels]}
-                      </Badge>
-                      <Badge className={`text-xs ${priorityColors[announcement.priority as keyof typeof priorityColors]}`}>
-                        {announcement.priority.charAt(0).toUpperCase() + announcement.priority.slice(1)}
-                      </Badge>
-                    </div>
-                  </div>
-                  <h3 className="font-semibold text-foreground mb-1">{announcement.title}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2">{announcement.content}</p>
-                  <div className="flex items-center gap-1 mt-3 text-xs text-muted-foreground">
-                    <Clock className="w-3 h-3" />
-                    <span>{formatTimeAgo(announcement.createdAt)}</span>
-                  </div>
-                </CardContent>
-              </Card>
+            {filteredAnnouncements.map((announcement) => (
+              <AnnouncementCard
+                key={announcement.id}
+                announcement={announcement}
+                onBookmark={handleBookmark}
+                onShare={handleShare}
+              />
             ))}
           </div>
         ) : (
           <EmptyState
             icon="inbox"
-            title="No Announcements"
-            description="There are no announcements at this time. Check back later!"
+            title="No Announcements Found"
+            description={
+              searchQuery
+                ? `No results for "${searchQuery}". Try a different search term.`
+                : 'There are no announcements in this category yet.'
+            }
+            action={
+              searchQuery
+                ? {
+                    label: 'Clear Search',
+                    onClick: () => setSearchQuery(''),
+                  }
+                : undefined
+            }
           />
         )}
       </main>
 
-      <BottomNav notificationCount={8} />
+      <BottomNav notificationCount={unreadCount} />
     </div>
   )
 }
