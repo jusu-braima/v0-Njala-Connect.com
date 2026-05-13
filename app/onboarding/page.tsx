@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { useRouter } from 'next/navigation'
 import { Megaphone, MessageSquareWarning, CalendarDays, ChevronRight } from 'lucide-react'
+import Image from 'next/image'
 
 const onboardingSteps = [
   {
@@ -11,18 +12,21 @@ const onboardingSteps = [
     title: 'Stay Informed',
     description: 'Receive verified academic and campus announcements in real time.',
     color: 'bg-primary/10 text-primary',
+    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/njalauniversity_cover.jfif-7VWDFFIMhViXiERgBJ12MTvXRYfXgE.jpeg',
   },
   {
     icon: MessageSquareWarning,
     title: 'Report Issues',
-    description: 'Submit campus complaints and track progress.',
+    description: 'Submit campus complaints and track their resolution progress.',
     color: 'bg-amber-500/10 text-amber-600',
+    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/images.jfif-zhPjAtFGdao46k2CHmNCTo4fBLvfd6.jpeg',
   },
   {
     icon: CalendarDays,
     title: 'Get Involved',
     description: 'Discover campus events, opportunities, and student activities.',
     color: 'bg-emerald-500/10 text-emerald-600',
+    image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/njalauniversity_cover.jfif-7VWDFFIMhViXiERgBJ12MTvXRYfXgE.jpeg',
   },
 ]
 
@@ -56,10 +60,21 @@ export default function OnboardingPage() {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-8">
-        {/* Icon */}
-        <div className={`w-28 h-28 rounded-3xl ${step.color} flex items-center justify-center mb-8 shadow-sm`}>
-          <Icon className="w-14 h-14" />
+      <div className="flex-1 flex flex-col items-center px-6 pb-8">
+        {/* Campus image */}
+        <div className="relative w-full max-w-sm h-48 rounded-2xl overflow-hidden mb-8 shadow-lg">
+          <Image
+            src={step.image}
+            alt="Njala University Campus"
+            fill
+            className="object-cover transition-opacity duration-500"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+          {/* Icon overlay */}
+          <div className={`absolute bottom-4 right-4 w-14 h-14 rounded-2xl ${step.color} flex items-center justify-center shadow-lg backdrop-blur-sm bg-white/90`}>
+            <Icon className="w-7 h-7" />
+          </div>
         </div>
 
         {/* Text content */}

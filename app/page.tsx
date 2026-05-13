@@ -3,36 +3,39 @@
 import { Button } from '@/components/ui/button'
 import { Logo } from '@/components/logo'
 import Link from 'next/link'
-import { GraduationCap, Users, Building2 } from 'lucide-react'
+import Image from 'next/image'
 
 export default function SplashPage() {
   return (
-    <div className="min-h-screen gradient-splash flex flex-col relative overflow-hidden">
-      {/* Background decorative elements */}
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-primary">
+      {/* Background campus image with overlay */}
+      <div className="absolute inset-0">
+        <Image
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/njalauniversity_cover.jfif-7VWDFFIMhViXiERgBJ12MTvXRYfXgE.jpeg"
+          alt="Njala University Campus"
+          fill
+          className="object-cover opacity-20"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/90 via-primary/95 to-primary" />
+      </div>
+
+      {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 -left-20 w-64 h-64 rounded-full bg-white/5 blur-3xl" />
         <div className="absolute bottom-40 -right-20 w-80 h-80 rounded-full bg-white/5 blur-3xl" />
-        
-        {/* Campus illustration overlay - subtle icons */}
-        <div className="absolute top-1/4 left-8 opacity-10">
-          <GraduationCap className="w-12 h-12 text-white" />
-        </div>
-        <div className="absolute top-1/3 right-12 opacity-10">
-          <Users className="w-10 h-10 text-white" />
-        </div>
-        <div className="absolute bottom-1/3 left-1/4 opacity-10">
-          <Building2 className="w-14 h-14 text-white" />
-        </div>
       </div>
 
       {/* Main content */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
         <div className="text-center space-y-6">
-          {/* Logo */}
-          <Logo size="xl" variant="light" />
+          {/* Logo with University Crest */}
+          <div className="bg-white/95 rounded-2xl p-5 shadow-2xl backdrop-blur-sm">
+            <Logo size="xl" variant="dark" />
+          </div>
           
-          {/* Subtitle */}
-          <p className="text-white/80 text-lg font-medium max-w-xs mx-auto leading-relaxed">
+          {/* Tagline */}
+          <p className="text-white/90 text-lg font-medium max-w-xs mx-auto leading-relaxed mt-6">
             One Campus. One Community. Connected.
           </p>
         </div>
