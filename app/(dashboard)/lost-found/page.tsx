@@ -1,37 +1,27 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { DashboardHeader } from '@/components/dashboard-header'
 import { BottomNav } from '@/components/bottom-nav'
 import { LostItemCard } from '@/components/lost-item-card'
-import { FilterDropdown } from '@/components/filter-dropdown'
 import { EmptyState } from '@/components/empty-state'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { mockLostItems, mockFoundItems, lostFoundCategories } from '@/lib/data'
+import { mockLostItems, mockFoundItems } from '@/lib/data'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
-  Search,
-  SearchX,
-  Package,
-  ChevronRight,
-  AlertCircle,
-  CheckCircle
+  ArrowLeft,
+  Plus,
+  CalendarDays
 } from 'lucide-react'
 
 export default function LostFoundPage() {
   const { isAuthenticated } = useAuth()
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<'all' | 'lost' | 'found'>('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState('all')
-  const [statusFilter, setStatusFilter] = useState('all')
+  const [activeTab, setActiveTab] = useState<'lost' | 'found'>('lost')
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -39,35 +29,9 @@ export default function LostFoundPage() {
     }
   }, [isAuthenticated, router])
 
-  const allItems = useMemo(() => {
-    return [...mockLostItems, ...mockFoundItems].sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
-    )
-  }, [])
-
-  const filteredItems = useMemo(() => {
-    return allItems.filter(item => {
-      if (activeTab !== 'all' && item.type !== activeTab) return false
-      if (categoryFilter !== 'all' && item.category !== categoryFilter) return false
-      if (statusFilter !== 'all' && item.status !== statusFilter) return false
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase()
-        return (
-          item.title.toLowerCase().includes(query) ||
-          item.description.toLowerCase().includes(query) ||
-          item.location.toLowerCase().includes(query)
-        )
-      }
-      return true
-    })
-  }, [allItems, activeTab, categoryFilter, statusFilter, searchQuery])
-
-  const stats = useMemo(() => {
-    const lost = mockLostItems.filter(i => i.status === 'active').length
-    const found = mockFoundItems.filter(i => i.status === 'active').length
-    const resolved = allItems.filter(i => i.status === 'resolved' || i.status === 'claimed').length
-    return { lost, found, resolved }
-  }, [allItems])
+  const items = useMemo(() => {
+    return activeTab === 'lost' ? mockLostItems : mockFoundItems
+  }, [activeTab])
 
   if (!isAuthenticated) {
     return null
@@ -75,140 +39,127 @@ export default function LostFoundPage() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <DashboardHeader notificationCount={8} />
-
-      <main className="px-4 py-6 max-w-lg mx-auto">
-        {/* Page Header */}
-        <div className="mb-6">
-          <h1 className="text-xl font-bold text-foreground">Lost & Found</h1>
-          <p className="text-sm text-muted-foreground">Find or report lost items on campus</p>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Link href="/lost-found/report?type=lost">
-            <Card className="h-full hover:shadow-md transition-all hover:scale-[1.02] cursor-pointer group border-destructive/20 bg-destructive/5">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
-                    <SearchX className="w-5 h-5 text-destructive" />
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-destructive transition-colors" />
-                </div>
-                <h3 className="font-semibold text-foreground group-hover:text-destructive transition-colors">
-                  Report Lost Item
-                </h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Lost something? Let others help find it.
-                </p>
-              </CardContent>
-            </Card>
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-primary">
+        <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
+          <Link href="/dashboard">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
           </Link>
-          <Link href="/lost-found/report?type=found">
-            <Card className="h-full hover:shadow-md transition-all hover:scale-[1.02] cursor-pointer group border-success/20 bg-success/5">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
-                    <Package className="w-5 h-5 text-success" />
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-success transition-colors" />
-                </div>
-                <h3 className="font-semibold text-foreground group-hover:text-success transition-colors">
-                  Report Found Item
-                </h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Found something? Help reunite it with the owner.
-                </p>
-              </CardContent>
-            </Card>
+          <h1 className="text-lg font-semibold text-white">Lost & Found</h1>
+          <Link href={`/lost-found/report?type=${activeTab}`}>
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+              <Plus className="w-5 h-5" />
+            </Button>
           </Link>
         </div>
+      </header>
 
-        {/* Stats */}
-        <div className="flex items-center gap-4 p-4 rounded-lg bg-muted/50 mb-6">
-          <div className="flex-1 text-center">
-            <p className="text-2xl font-bold text-destructive">{stats.lost}</p>
-            <p className="text-xs text-muted-foreground">Lost Items</p>
-          </div>
-          <div className="w-px h-10 bg-border" />
-          <div className="flex-1 text-center">
-            <p className="text-2xl font-bold text-success">{stats.found}</p>
-            <p className="text-xs text-muted-foreground">Found Items</p>
-          </div>
-          <div className="w-px h-10 bg-border" />
-          <div className="flex-1 text-center">
-            <p className="text-2xl font-bold text-primary">{stats.resolved}</p>
-            <p className="text-xs text-muted-foreground">Resolved</p>
+      {/* Toggle Tabs */}
+      <div className="bg-background border-b border-border sticky top-14 z-30">
+        <div className="px-4 py-3 max-w-lg mx-auto">
+          <div className="flex rounded-xl overflow-hidden bg-muted p-1">
+            <button
+              onClick={() => setActiveTab('lost')}
+              className={cn(
+                'flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors',
+                activeTab === 'lost'
+                  ? 'bg-primary text-white'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Lost Items
+            </button>
+            <button
+              onClick={() => setActiveTab('found')}
+              className={cn(
+                'flex-1 py-2.5 text-sm font-medium rounded-lg transition-colors',
+                activeTab === 'found'
+                  ? 'bg-primary text-white'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              Found Items
+            </button>
           </div>
         </div>
+      </div>
 
-        {/* Search */}
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search items..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'all' | 'lost' | 'found')} className="mb-4">
-          <TabsList className="w-full grid grid-cols-3">
-            <TabsTrigger value="all">All</TabsTrigger>
-            <TabsTrigger value="lost" className="text-destructive data-[state=active]:text-destructive">
-              Lost
-            </TabsTrigger>
-            <TabsTrigger value="found" className="text-success data-[state=active]:text-success">
-              Found
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-
-        {/* Filters */}
-        <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1">
-          <FilterDropdown
-            label="Category"
-            value={categoryFilter}
-            options={[
-              { value: 'all', label: 'All Categories' },
-              ...lostFoundCategories.map(c => ({ value: c.id, label: c.label }))
-            ]}
-            onChange={setCategoryFilter}
-          />
-          <FilterDropdown
-            label="Status"
-            value={statusFilter}
-            options={[
-              { value: 'all', label: 'All Status' },
-              { value: 'active', label: 'Active' },
-              { value: 'claimed', label: 'Claimed' },
-              { value: 'resolved', label: 'Resolved' },
-            ]}
-            onChange={setStatusFilter}
-          />
-        </div>
-
-        {/* Items Feed */}
-        {filteredItems.length === 0 ? (
+      <main className="px-4 py-4 max-w-lg mx-auto">
+        {/* Items List */}
+        {items.length === 0 ? (
           <EmptyState
-            icon="search"
-            title="No items found"
-            description={searchQuery 
-              ? `No results for "${searchQuery}". Try a different search term.`
-              : "No items match your current filters."}
+            icon={activeTab === 'lost' ? 'lost' : 'found'}
+            title={`No ${activeTab} items`}
+            description={activeTab === 'lost' 
+              ? "No lost items have been reported yet."
+              : "No found items have been reported yet."}
+            action={{
+              label: `Report ${activeTab === 'lost' ? 'Lost' : 'Found'} Item`,
+              onClick: () => router.push(`/lost-found/report?type=${activeTab}`)
+            }}
           />
         ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {filteredItems.map((item) => (
-              <LostItemCard key={item.id} item={item} />
+          <div className="space-y-3">
+            {items.map((item) => (
+              <Link key={item.id} href={`/lost-found/${item.id}`}>
+                <div className="flex gap-3 p-3 bg-card border border-border rounded-xl hover:shadow-md transition-shadow">
+                  {/* Item Image */}
+                  <div className="w-20 h-20 rounded-lg bg-muted flex-shrink-0 overflow-hidden">
+                    {item.imageUrl ? (
+                      <Image 
+                        src={item.imageUrl} 
+                        alt={item.title}
+                        width={80}
+                        height={80}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                        <span className="text-3xl">
+                          {item.category === 'student-id' ? '🪪' : 
+                           item.category === 'phone' ? '📱' : 
+                           item.category === 'wallet' ? '👛' : 
+                           item.category === 'laptop' ? '💻' : 
+                           item.category === 'keys' ? '🔑' : 
+                           item.category === 'books' ? '📚' : '📦'}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Item Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <h3 className="font-medium text-sm text-foreground line-clamp-1">
+                        {item.title}
+                      </h3>
+                      <span className={cn(
+                        'text-[10px] font-medium px-2 py-0.5 rounded',
+                        item.type === 'lost' 
+                          ? 'bg-destructive/15 text-destructive'
+                          : 'bg-success/15 text-success'
+                      )}>
+                        {item.type === 'lost' ? 'Lost' : 'Found'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground line-clamp-1 mb-1.5">
+                      {item.description}
+                    </p>
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <CalendarDays className="w-3 h-3" />
+                      <span>{item.date.toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
             ))}
           </div>
         )}
       </main>
 
-      <BottomNav notificationCount={8} />
+      <BottomNav />
     </div>
   )
 }

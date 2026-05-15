@@ -1,34 +1,28 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { DashboardHeader } from '@/components/dashboard-header'
 import { BottomNav } from '@/components/bottom-nav'
-import { EventCard, EventCardSkeleton } from '@/components/event-card'
-import { FilterDropdown } from '@/components/filter-dropdown'
 import { EmptyState } from '@/components/empty-state'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { mockEvents, eventCategories } from '@/lib/data'
+import { mockEvents } from '@/lib/data'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import {
-  Search,
-  Calendar,
-  ChevronRight,
-  Bookmark,
-  Filter
+  ArrowLeft,
+  CalendarDays,
+  Clock,
+  MapPin,
+  Bookmark
 } from 'lucide-react'
+import { format } from 'date-fns'
 
 export default function EventsPage() {
   const { isAuthenticated } = useAuth()
   const router = useRouter()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState('all')
-  const [dateFilter, setDateFilter] = useState('all')
+  const [activeTab, setActiveTab] = useState<'upcoming' | 'ongoing' | 'past'>('upcoming')
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -36,43 +30,19 @@ export default function EventsPage() {
     }
   }, [isAuthenticated, router])
 
-  // Featured events
-  const featuredEvents = useMemo(() => {
-    return mockEvents.filter(e => e.isFeatured && e.status === 'upcoming').slice(0, 3)
-  }, [])
-
-  // Filter events
+  // Filter events by status
   const filteredEvents = useMemo(() => {
+    const now = new Date()
     return mockEvents.filter(event => {
-      // Search filter
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase()
-        if (!event.title.toLowerCase().includes(query) && 
-            !event.description.toLowerCase().includes(query) &&
-            !event.organizer.toLowerCase().includes(query)) {
-          return false
-        }
-      }
+      const startDate = new Date(event.startDate)
+      const endDate = new Date(event.endDate)
       
-      // Category filter
-      if (categoryFilter !== 'all' && event.category !== categoryFilter) {
-        return false
-      }
-      
-      // Date filter
-      if (dateFilter !== 'all') {
-        const now = new Date()
-        const eventDate = new Date(event.startDate)
-        const diffDays = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-        
-        if (dateFilter === 'today' && diffDays !== 0) return false
-        if (dateFilter === 'this-week' && (diffDays < 0 || diffDays > 7)) return false
-        if (dateFilter === 'this-month' && (diffDays < 0 || diffDays > 30)) return false
-      }
-      
+      if (activeTab === 'upcoming') return startDate > now
+      if (activeTab === 'ongoing') return startDate <= now && endDate >= now
+      if (activeTab === 'past') return endDate < now
       return true
     })
-  }, [searchQuery, categoryFilter, dateFilter])
+  }, [activeTab])
 
   if (!isAuthenticated) {
     return null
@@ -80,134 +50,105 @@ export default function EventsPage() {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <DashboardHeader notificationCount={8} />
-
-      <main className="px-4 py-6 max-w-lg mx-auto">
-        {/* Page Header */}
-        <div className="mb-6">
-          <h1 className="text-xl font-bold text-foreground">Campus Events</h1>
-          <p className="text-sm text-muted-foreground">
-            Discover programs, meetings, workshops, and activities happening at Njala Campus.
-          </p>
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-primary">
+        <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
+          <Link href="/dashboard">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          </Link>
+          <h1 className="text-lg font-semibold text-white">Events</h1>
+          <Link href="/events/my-events">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+              <CalendarDays className="w-5 h-5" />
+            </Button>
+          </Link>
         </div>
+      </header>
 
-        {/* Search Bar */}
-        <div className="relative mb-4">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search events..."
-            className="pl-10"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-
-        {/* Filters */}
-        <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1">
-          <FilterDropdown
-            label="Category"
-            value={categoryFilter}
-            options={[
-              { value: 'all', label: 'All Categories' },
-              ...eventCategories.map(c => ({ value: c.id, label: c.label }))
-            ]}
-            onChange={setCategoryFilter}
-          />
-          <FilterDropdown
-            label="Date"
-            value={dateFilter}
-            options={[
-              { value: 'all', label: 'All Dates' },
-              { value: 'today', label: 'Today' },
-              { value: 'this-week', label: 'This Week' },
-              { value: 'this-month', label: 'This Month' },
-            ]}
-            onChange={setDateFilter}
-          />
-        </div>
-
-        {/* Featured Events */}
-        {featuredEvents.length > 0 && !searchQuery && categoryFilter === 'all' && (
-          <section className="mb-8">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-semibold text-foreground">Featured Events</h2>
-              <Link href="/events/my-events">
-                <Button variant="ghost" size="sm" className="gap-1">
-                  <Bookmark className="w-4 h-4" />
-                  My Events
-                </Button>
-              </Link>
-            </div>
-            <div className="space-y-4">
-              {featuredEvents.map((event) => (
-                <EventCard 
-                  key={event.id} 
-                  event={event} 
-                  variant="featured"
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Category Quick Links */}
-        {!searchQuery && categoryFilter === 'all' && (
-          <section className="mb-8">
-            <h2 className="text-base font-semibold text-foreground mb-3">Browse by Category</h2>
-            <div className="flex flex-wrap gap-2">
-              {eventCategories.map((category) => (
-                <Badge
-                  key={category.id}
-                  variant="outline"
-                  className="cursor-pointer hover:bg-primary/10 hover:text-primary hover:border-primary transition-colors py-1.5 px-3"
-                  onClick={() => setCategoryFilter(category.id)}
-                >
-                  {category.label}
-                </Badge>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* All Events */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-base font-semibold text-foreground">
-              {categoryFilter !== 'all' 
-                ? eventCategories.find(c => c.id === categoryFilter)?.label + ' Events'
-                : 'Upcoming Events'}
-            </h2>
-            {categoryFilter !== 'all' && (
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => setCategoryFilter('all')}
+      {/* Status Tabs */}
+      <div className="bg-background border-b border-border sticky top-14 z-30">
+        <div className="px-4 py-3 max-w-lg mx-auto">
+          <div className="flex gap-2">
+            {(['upcoming', 'ongoing', 'past'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  'px-4 py-2 rounded-full text-sm font-medium transition-colors capitalize',
+                  activeTab === tab
+                    ? 'bg-primary text-white'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                )}
               >
-                Clear filter
-              </Button>
-            )}
+                {tab}
+              </button>
+            ))}
           </div>
+        </div>
+      </div>
 
-          {filteredEvents.length === 0 ? (
-            <EmptyState
-              icon="event"
-              title="No events found"
-              description={searchQuery || categoryFilter !== 'all' || dateFilter !== 'all'
-                ? "Try adjusting your search or filters to find events."
-                : "No upcoming events at the moment. Check back soon!"}
-            />
-          ) : (
-            <div className="space-y-3">
-              {filteredEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
-              ))}
-            </div>
-          )}
-        </section>
+      <main className="px-4 py-4 max-w-lg mx-auto">
+        {filteredEvents.length === 0 ? (
+          <EmptyState
+            icon="event"
+            title={`No ${activeTab} events`}
+            description={`There are no ${activeTab} events at the moment.`}
+          />
+        ) : (
+          <div className="space-y-4">
+            {filteredEvents.map((event) => (
+              <Link key={event.id} href={`/events/${event.id}`}>
+                <div className="flex gap-4 p-4 bg-card border border-border rounded-xl hover:shadow-md transition-shadow">
+                  {/* Date Badge */}
+                  <div className="flex flex-col items-center justify-center w-14 h-14 rounded-lg bg-primary/10 text-primary flex-shrink-0">
+                    <span className="text-[10px] font-medium uppercase">
+                      {format(event.startDate, 'MMM')}
+                    </span>
+                    <span className="text-xl font-bold leading-none">
+                      {format(event.startDate, 'd')}
+                    </span>
+                  </div>
+                  
+                  {/* Event Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <h3 className="font-semibold text-sm text-foreground line-clamp-1">
+                        {event.title}
+                      </h3>
+                      <button className="text-muted-foreground hover:text-primary transition-colors">
+                        <Bookmark className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <Clock className="w-3 h-3" />
+                        <span>{format(event.startDate, 'h:mm a')} - {format(event.endDate, 'h:mm a')}</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <MapPin className="w-3 h-3" />
+                        <span className="line-clamp-1">{event.location}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* View All Button */}
+        {filteredEvents.length > 0 && (
+          <div className="mt-6">
+            <Button variant="outline" className="w-full text-primary border-primary hover:bg-primary/5">
+              View All Events
+            </Button>
+          </div>
+        )}
       </main>
 
-      <BottomNav notificationCount={8} />
+      <BottomNav />
     </div>
   )
 }

@@ -1,11 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { DashboardHeader } from '@/components/dashboard-header'
 import { BottomNav } from '@/components/bottom-nav'
 import { ImageUpload } from '@/components/image-upload'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -18,13 +17,13 @@ import {
 } from '@/components/ui/select'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { complaintCategories, priorityLevels } from '@/lib/data'
-import { ComplaintCategory, ComplaintPriority } from '@/lib/types'
-import { ArrowLeft, Loader2, Send, Save } from 'lucide-react'
+import { complaintCategories } from '@/lib/data'
+import { ComplaintCategory } from '@/lib/types'
+import { ArrowLeft, Loader2, MessageSquareWarning } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 
-const MAX_DESCRIPTION_LENGTH = 1000
+const MAX_DESCRIPTION_LENGTH = 250
 
 export default function NewComplaintPage() {
   const { isAuthenticated } = useAuth()
@@ -32,14 +31,11 @@ export default function NewComplaintPage() {
   const searchParams = useSearchParams()
   
   const [isLoading, setIsLoading] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
   
   // Form state
-  const [title, setTitle] = useState('')
   const [category, setCategory] = useState<ComplaintCategory | ''>('')
+  const [subCategory, setSubCategory] = useState('')
   const [description, setDescription] = useState('')
-  const [location, setLocation] = useState('')
-  const [priority, setPriority] = useState<ComplaintPriority>('medium')
   const [image, setImage] = useState<string | undefined>()
 
   // Prefill category from URL
@@ -59,7 +55,7 @@ export default function NewComplaintPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!title.trim() || !category || !description.trim() || !location.trim()) {
+    if (!category || !description.trim()) {
       toast.error('Please fill in all required fields')
       return
     }
@@ -73,67 +69,50 @@ export default function NewComplaintPage() {
     router.push('/complaints')
   }
 
-  const handleSaveDraft = async () => {
-    setIsSaving(true)
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800))
-    
-    toast.success('Draft saved')
-    setIsSaving(false)
-  }
-
   if (!isAuthenticated) {
     return null
   }
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <DashboardHeader notificationCount={8} />
-
-      <main className="px-4 py-6 max-w-lg mx-auto">
-        {/* Header with back button */}
-        <div className="flex items-center gap-3 mb-6">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-primary">
+        <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
           <Link href="/complaints">
-            <Button variant="ghost" size="icon" className="h-9 w-9">
-              <ArrowLeft className="h-5 w-5" />
-              <span className="sr-only">Back</span>
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+              <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Submit Complaint</h1>
-            <p className="text-sm text-muted-foreground">Report a campus issue</p>
+          <h1 className="text-lg font-semibold text-white">New Complaint</h1>
+          <div className="w-10" /> {/* Spacer */}
+        </div>
+      </header>
+
+      <main className="px-4 py-5 max-w-lg mx-auto">
+        {/* Icon */}
+        <div className="flex justify-center mb-6">
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+            <MessageSquareWarning className="w-10 h-10 text-primary" />
           </div>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Title */}
-          <div className="space-y-2">
-            <Label htmlFor="title">
-              Complaint Title <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="title"
-              placeholder="Brief title describing the issue"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              disabled={isLoading}
-            />
-          </div>
+        <div className="text-center mb-6">
+          <h2 className="text-lg font-semibold text-foreground">Submit a Complaint</h2>
+          <p className="text-sm text-muted-foreground">Let us know how we can help you.</p>
+        </div>
 
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-5">
           {/* Category */}
           <div className="space-y-2">
-            <Label htmlFor="category">
-              Category <span className="text-destructive">*</span>
-            </Label>
+            <Label htmlFor="category" className="text-foreground">Category</Label>
             <Select
               value={category}
               onValueChange={(value) => setCategory(value as ComplaintCategory)}
               disabled={isLoading}
             >
-              <SelectTrigger id="category">
-                <SelectValue placeholder="Select a category" />
+              <SelectTrigger id="category" className="h-12 rounded-xl">
+                <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
                 {complaintCategories.map((cat) => (
@@ -145,113 +124,77 @@ export default function NewComplaintPage() {
             </Select>
           </div>
 
+          {/* Sub-Category */}
+          <div className="space-y-2">
+            <Label htmlFor="subCategory" className="text-foreground">Sub-Category</Label>
+            <Select
+              value={subCategory}
+              onValueChange={setSubCategory}
+              disabled={isLoading || !category}
+            >
+              <SelectTrigger id="subCategory" className="h-12 rounded-xl">
+                <SelectValue placeholder="Select sub-category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="water-supply">Water Supply</SelectItem>
+                <SelectItem value="plumbing">Plumbing</SelectItem>
+                <SelectItem value="drainage">Drainage</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Description */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="description">
-                Detailed Description <span className="text-destructive">*</span>
-              </Label>
+              <Label htmlFor="description" className="text-foreground">Description</Label>
               <span className="text-xs text-muted-foreground">
                 {description.length}/{MAX_DESCRIPTION_LENGTH}
               </span>
             </div>
             <Textarea
               id="description"
-              placeholder="Describe the issue in detail. Include when it started and how it affects you."
+              placeholder="Please describe your issue in detail..."
               value={description}
               onChange={(e) => setDescription(e.target.value.slice(0, MAX_DESCRIPTION_LENGTH))}
-              className="min-h-[120px] resize-none"
+              className="min-h-[100px] resize-none rounded-xl"
               disabled={isLoading}
             />
-          </div>
-
-          {/* Location */}
-          <div className="space-y-2">
-            <Label htmlFor="location">
-              Location <span className="text-destructive">*</span>
-            </Label>
-            <Input
-              id="location"
-              placeholder="e.g., Block A Hostel, Room 205"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              disabled={isLoading}
-            />
-          </div>
-
-          {/* Priority */}
-          <div className="space-y-2">
-            <Label htmlFor="priority">Priority Level</Label>
-            <Select
-              value={priority}
-              onValueChange={(value) => setPriority(value as ComplaintPriority)}
-              disabled={isLoading}
-            >
-              <SelectTrigger id="priority">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {priorityLevels.map((level) => (
-                  <SelectItem key={level.id} value={level.id}>
-                    <div className="flex flex-col">
-                      <span>{level.label}</span>
-                      <span className="text-xs text-muted-foreground">{level.description}</span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Image Upload */}
           <div className="space-y-2">
-            <Label>Photo Evidence (Optional)</Label>
-            <ImageUpload
-              value={image}
-              onChange={setImage}
-              disabled={isLoading}
-            />
+            <Label className="text-foreground">Upload Photo (Optional)</Label>
+            <Card className="border-dashed border-2 border-border">
+              <CardContent className="p-4">
+                <ImageUpload
+                  value={image}
+                  onChange={setImage}
+                  disabled={isLoading}
+                />
+              </CardContent>
+            </Card>
           </div>
 
-          {/* Actions */}
-          <div className="flex flex-col gap-3 pt-4">
-            <Button type="submit" disabled={isLoading} className="w-full">
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                <>
-                  <Send className="w-4 h-4 mr-2" />
-                  Submit Complaint
-                </>
-              )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleSaveDraft}
-              disabled={isLoading || isSaving}
-              className="w-full"
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="w-4 h-4 mr-2" />
-                  Save Draft
-                </>
-              )}
-            </Button>
-          </div>
+          {/* Submit Button */}
+          <Button 
+            type="submit" 
+            disabled={isLoading} 
+            className="w-full h-14 text-base font-semibold rounded-xl"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              'Submit Complaint'
+            )}
+          </Button>
         </form>
       </main>
 
-      <BottomNav notificationCount={8} />
+      <BottomNav />
     </div>
   )
 }
