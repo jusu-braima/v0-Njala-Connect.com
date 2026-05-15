@@ -1,99 +1,144 @@
 'use client'
 
-import { createContext, useContext, useState, ReactNode } from 'react'
-import { User, UserRole } from '@/lib/types'
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { User as SupabaseUser } from '@supabase/supabase-js'
+
+export type UserRole = 'student' | 'staff' | 'admin'
+
+export interface Profile {
+  id: string
+  email: string
+  full_name: string | null
+  student_id: string | null
+  department: string | null
+  role: UserRole
+  avatar_url: string | null
+  phone: string | null
+  bio: string | null
+  created_at: string
+  updated_at: string
+}
 
 interface AuthContextType {
-  user: User | null
+  user: SupabaseUser | null
+  profile: Profile | null
   isAuthenticated: boolean
   isLoading: boolean
-  login: (email: string, password: string) => Promise<boolean>
-  register: (userData: Partial<User> & { password: string }) => Promise<boolean>
-  logout: () => void
-  updateProfile: (data: Partial<User>) => Promise<boolean>
+  isAdmin: boolean
+  isStaff: boolean
+  logout: () => Promise<void>
+  refreshProfile: () => Promise<void>
+  updateProfile: (data: Partial<Profile>) => Promise<boolean>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [user, setUser] = useState<SupabaseUser | null>(null)
+  const [profile, setProfile] = useState<Profile | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const supabase = createClient()
 
-  const login = async (email: string, password: string): Promise<boolean> => {
-    setIsLoading(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
+  const fetchProfile = useCallback(async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
     
-    // Mock login - in production, this would call a real API
-    if (email && password) {
-      const mockUser: User = {
-        id: '1',
-        fullName: email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        email,
-        role: email.includes('admin') ? 'admin' : email.includes('staff') ? 'lecturer' : 'student',
-        studentId: email.includes('student') ? 'NU2024001' : undefined,
-        department: 'Computer Science',
-        faculty: 'Faculty of Basic Sciences',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }
-      setUser(mockUser)
-      setIsLoading(false)
-      return true
+    if (error) {
+      console.error('Error fetching profile:', error)
+      return null
     }
-    setIsLoading(false)
-    return false
-  }
+    return data as Profile
+  }, [supabase])
 
-  const register = async (userData: Partial<User> & { password: string }): Promise<boolean> => {
-    setIsLoading(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    const newUser: User = {
-      id: Date.now().toString(),
-      fullName: userData.fullName || '',
-      email: userData.email || '',
-      role: userData.role as UserRole || 'student',
-      studentId: userData.studentId,
-      department: userData.department,
-      faculty: userData.faculty,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
-    setUser(newUser)
-    setIsLoading(false)
-    return true
-  }
-
-  const logout = () => {
-    setUser(null)
-  }
-
-  const updateProfile = async (data: Partial<User>): Promise<boolean> => {
-    setIsLoading(true)
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
+  const refreshProfile = useCallback(async () => {
     if (user) {
-      setUser({
-        ...user,
-        ...data,
-        updatedAt: new Date(),
-      })
+      const profileData = await fetchProfile(user.id)
+      setProfile(profileData)
     }
-    setIsLoading(false)
+  }, [user, fetchProfile])
+
+  useEffect(() => {
+    // Get initial session
+    const initializeAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        setUser(session?.user ?? null)
+        
+        if (session?.user) {
+          const profileData = await fetchProfile(session.user.id)
+          setProfile(profileData)
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    initializeAuth()
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setUser(session?.user ?? null)
+        
+        if (session?.user) {
+          const profileData = await fetchProfile(session.user.id)
+          setProfile(profileData)
+        } else {
+          setProfile(null)
+        }
+        
+        setIsLoading(false)
+      }
+    )
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [supabase, fetchProfile])
+
+  const logout = async () => {
+    await supabase.auth.signOut()
+    setUser(null)
+    setProfile(null)
+  }
+
+  const updateProfile = async (data: Partial<Profile>): Promise<boolean> => {
+    if (!user) return false
+
+    const { error } = await supabase
+      .from('profiles')
+      .update(data)
+      .eq('id', user.id)
+
+    if (error) {
+      console.error('Error updating profile:', error)
+      return false
+    }
+
+    await refreshProfile()
     return true
   }
+
+  const isAdmin = profile?.role === 'admin'
+  const isStaff = profile?.role === 'staff' || profile?.role === 'admin'
 
   return (
     <AuthContext.Provider
       value={{
         user,
+        profile,
         isAuthenticated: !!user,
         isLoading,
-        login,
-        register,
+        isAdmin,
+        isStaff,
         logout,
+        refreshProfile,
         updateProfile,
       }}
     >

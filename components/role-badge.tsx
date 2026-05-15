@@ -1,7 +1,8 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { UserRole } from '@/lib/types'
+
+type UserRole = 'student' | 'staff' | 'admin' | 'lecturer'
 
 interface RoleBadgeProps {
   role: UserRole
@@ -9,10 +10,14 @@ interface RoleBadgeProps {
   className?: string
 }
 
-const roleConfig = {
+const roleConfig: Record<UserRole, { label: string; className: string }> = {
   student: {
     label: 'Student',
     className: 'bg-primary/10 text-primary border-primary/20',
+  },
+  staff: {
+    label: 'Staff',
+    className: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/20',
   },
   lecturer: {
     label: 'Lecturer',

@@ -1,15 +1,12 @@
 'use client'
 
-import { useMemo } from 'react'
+import useSWR from 'swr'
 import { DashboardHeader } from '@/components/dashboard-header'
 import { BottomNav } from '@/components/bottom-nav'
 import { StatsCard, StatsGrid } from '@/components/stats-card'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { useAuth } from '@/lib/auth-context'
-import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
-import { mockComplaints, mockLostItems, mockFoundItems } from '@/lib/data'
 import Link from 'next/link'
 import {
   ArrowLeft,
@@ -23,43 +20,50 @@ import {
   Users,
   TrendingUp,
   CalendarDays,
-  Gift
+  Gift,
+  Megaphone,
+  UserCog,
+  Loader2,
+  GraduationCap,
+  Shield,
 } from 'lucide-react'
 
+const fetcher = (url: string) => fetch(url).then(res => res.json())
+
+interface AdminStats {
+  users: {
+    total: number
+    students: number
+    staff: number
+    admins: number
+    newThisWeek: number
+  }
+  announcements: {
+    total: number
+  }
+  departments: Record<string, number>
+}
+
 export default function AdminDashboardPage() {
-  const { isAuthenticated, user } = useAuth()
-  const router = useRouter()
+  const { isAuthenticated, isAdmin, isLoading: authLoading } = useAuth()
+  
+  const { data: stats, isLoading: statsLoading } = useSWR<AdminStats>(
+    isAdmin ? '/api/admin/stats' : null,
+    fetcher
+  )
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login')
-    }
-  }, [isAuthenticated, router])
-
-  const complaintStats = useMemo(() => {
-    const pending = mockComplaints.filter(c => c.status === 'pending').length
-    const inProgress = mockComplaints.filter(c => c.status === 'in-progress').length
-    const resolved = mockComplaints.filter(c => c.status === 'resolved').length
-    const urgent = mockComplaints.filter(c => c.priority === 'urgent').length
-    return { pending, inProgress, resolved, urgent, total: mockComplaints.length }
-  }, [])
-
-  const lostFoundStats = useMemo(() => {
-    const allItems = [...mockLostItems, ...mockFoundItems]
-    const lost = mockLostItems.filter(i => i.status === 'active').length
-    const found = mockFoundItems.filter(i => i.status === 'active').length
-    const resolved = allItems.filter(i => i.status === 'resolved').length
-    return { lost, found, resolved, total: allItems.length }
-  }, [])
-
-  if (!isAuthenticated) {
-    return null
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
   }
 
-  if (user?.role !== 'admin') {
+  if (!isAuthenticated || !isAdmin) {
     return (
       <div className="min-h-screen bg-background pb-20">
-        <DashboardHeader notificationCount={8} />
+        <DashboardHeader notificationCount={0} />
         <main className="px-4 py-6 max-w-lg mx-auto">
           <Card>
             <CardContent className="py-12 text-center">
@@ -74,14 +78,14 @@ export default function AdminDashboardPage() {
             </CardContent>
           </Card>
         </main>
-        <BottomNav notificationCount={8} />
+        <BottomNav notificationCount={0} />
       </div>
     )
   }
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <DashboardHeader notificationCount={8} />
+      <DashboardHeader notificationCount={0} />
 
       <main className="px-4 py-6 max-w-4xl mx-auto">
         {/* Header */}
@@ -100,42 +104,84 @@ export default function AdminDashboardPage() {
         {/* Overview Stats */}
         <div className="mb-8">
           <h2 className="text-base font-semibold text-foreground mb-3">Overview</h2>
-          <StatsGrid className="lg:grid-cols-4">
-            <StatsCard
-              title="Total Complaints"
-              value={complaintStats.total}
-              icon={MessageSquareWarning}
-              color="primary"
-              description={`${complaintStats.pending} pending`}
-            />
-            <StatsCard
-              title="Urgent Issues"
-              value={complaintStats.urgent}
-              icon={AlertTriangle}
-              color="destructive"
-              description="Require immediate attention"
-            />
-            <StatsCard
-              title="Lost Items"
-              value={lostFoundStats.lost}
-              icon={SearchX}
-              color="warning"
-              description="Active reports"
-            />
-            <StatsCard
-              title="Found Items"
-              value={lostFoundStats.found}
-              icon={Package}
-              color="success"
-              description="Awaiting claim"
-            />
-          </StatsGrid>
+          {statsLoading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+          ) : (
+            <StatsGrid className="lg:grid-cols-4">
+              <StatsCard
+                title="Total Users"
+                value={stats?.users.total || 0}
+                icon={Users}
+                color="primary"
+                description={`${stats?.users.newThisWeek || 0} new this week`}
+              />
+              <StatsCard
+                title="Students"
+                value={stats?.users.students || 0}
+                icon={GraduationCap}
+                color="success"
+                description="Enrolled students"
+              />
+              <StatsCard
+                title="Staff"
+                value={stats?.users.staff || 0}
+                icon={UserCog}
+                color="warning"
+                description="Faculty & staff"
+              />
+              <StatsCard
+                title="Announcements"
+                value={stats?.announcements.total || 0}
+                icon={Megaphone}
+                color="destructive"
+                description="Total published"
+              />
+            </StatsGrid>
+          )}
         </div>
 
         {/* Management Sections */}
         <div className="space-y-4">
           <h2 className="text-base font-semibold text-foreground">Management</h2>
           
+          {/* User Management */}
+          <Link href="/admin/users">
+            <Card className="hover:shadow-md transition-all hover:scale-[1.01] cursor-pointer group">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Users className="w-7 h-7 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
+                      User Management
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Manage users, roles, and permissions
+                    </p>
+                    <div className="flex items-center gap-4 mt-2">
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <GraduationCap className="w-3.5 h-3.5 text-success" />
+                        <span className="text-muted-foreground">{stats?.users.students || 0} students</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <UserCog className="w-3.5 h-3.5 text-warning" />
+                        <span className="text-muted-foreground">{stats?.users.staff || 0} staff</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <Shield className="w-3.5 h-3.5 text-destructive" />
+                        <span className="text-muted-foreground">{stats?.users.admins || 0} admins</span>
+                      </div>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
           {/* Complaints Management */}
           <Link href="/admin/complaints">
             <Card className="hover:shadow-md transition-all hover:scale-[1.01] cursor-pointer group">
@@ -154,15 +200,15 @@ export default function AdminDashboardPage() {
                     <div className="flex items-center gap-4 mt-2">
                       <div className="flex items-center gap-1.5 text-xs">
                         <Clock className="w-3.5 h-3.5 text-warning" />
-                        <span className="text-muted-foreground">{complaintStats.pending} pending</span>
+                        <span className="text-muted-foreground">Pending</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-xs">
                         <TrendingUp className="w-3.5 h-3.5 text-primary" />
-                        <span className="text-muted-foreground">{complaintStats.inProgress} in progress</span>
+                        <span className="text-muted-foreground">In progress</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-xs">
                         <CheckCircle className="w-3.5 h-3.5 text-success" />
-                        <span className="text-muted-foreground">{complaintStats.resolved} resolved</span>
+                        <span className="text-muted-foreground">Resolved</span>
                       </div>
                     </div>
                   </div>
@@ -177,8 +223,8 @@ export default function AdminDashboardPage() {
             <Card className="hover:shadow-md transition-all hover:scale-[1.01] cursor-pointer group">
               <CardContent className="p-5">
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <SearchX className="w-7 h-7 text-primary" />
+                  <div className="w-14 h-14 rounded-xl bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                    <SearchX className="w-7 h-7 text-destructive" />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
@@ -190,15 +236,15 @@ export default function AdminDashboardPage() {
                     <div className="flex items-center gap-4 mt-2">
                       <div className="flex items-center gap-1.5 text-xs">
                         <SearchX className="w-3.5 h-3.5 text-destructive" />
-                        <span className="text-muted-foreground">{lostFoundStats.lost} lost</span>
+                        <span className="text-muted-foreground">Lost items</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-xs">
                         <Package className="w-3.5 h-3.5 text-success" />
-                        <span className="text-muted-foreground">{lostFoundStats.found} found</span>
+                        <span className="text-muted-foreground">Found items</span>
                       </div>
                       <div className="flex items-center gap-1.5 text-xs">
                         <CheckCircle className="w-3.5 h-3.5 text-primary" />
-                        <span className="text-muted-foreground">{lostFoundStats.resolved} resolved</span>
+                        <span className="text-muted-foreground">Resolved</span>
                       </div>
                     </div>
                   </div>
@@ -245,34 +291,30 @@ export default function AdminDashboardPage() {
           </Link>
         </div>
 
-        {/* Recent Activity */}
-        <div className="mt-8">
-          <h2 className="text-base font-semibold text-foreground mb-3">Recent Activity</h2>
-          <Card>
-            <CardContent className="p-4">
-              <div className="space-y-4">
-                {mockComplaints.slice(0, 3).map((complaint) => (
-                  <div key={complaint.id} className="flex items-start gap-3 pb-3 border-b border-border last:border-0 last:pb-0">
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-                      <MessageSquareWarning className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">
-                        {complaint.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {complaint.submittedBy.fullName} - {complaint.status}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Department Stats */}
+        {stats?.departments && Object.keys(stats.departments).length > 0 && (
+          <div className="mt-8">
+            <h2 className="text-base font-semibold text-foreground mb-3">Users by Department</h2>
+            <Card>
+              <CardContent className="p-4">
+                <div className="space-y-3">
+                  {Object.entries(stats.departments)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 6)
+                    .map(([dept, count]) => (
+                      <div key={dept} className="flex items-center justify-between">
+                        <span className="text-sm text-foreground">{dept}</span>
+                        <span className="text-sm font-medium text-muted-foreground">{count}</span>
+                      </div>
+                    ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </main>
 
-      <BottomNav notificationCount={8} />
+      <BottomNav notificationCount={0} />
     </div>
   )
 }
