@@ -56,29 +56,90 @@ export interface Event {
   category: 'academic' | 'social' | 'sports' | 'career' | 'other'
 }
 
+export type ComplaintCategory = 
+  | 'hostel' 
+  | 'electricity' 
+  | 'water' 
+  | 'internet' 
+  | 'academic' 
+  | 'security'
+
+export type ComplaintStatus = 'pending' | 'in-progress' | 'resolved' | 'rejected'
+
+export type ComplaintPriority = 'low' | 'medium' | 'high' | 'urgent'
+
+export interface ComplaintTimeline {
+  id: string
+  complaintId: string
+  status: ComplaintStatus
+  message: string
+  updatedBy: string
+  createdAt: Date
+}
+
 export interface Complaint {
   id: string
   title: string
   description: string
-  category: 'facilities' | 'academic' | 'administrative' | 'security' | 'other'
-  status: 'pending' | 'in-progress' | 'resolved' | 'closed'
+  category: ComplaintCategory
+  status: ComplaintStatus
+  priority: ComplaintPriority
+  location: string
+  imageUrl?: string
   submittedBy: User
+  assignedTo?: string
+  timeline: ComplaintTimeline[]
   createdAt: Date
   updatedAt: Date
 }
+
+export type LostFoundCategory = 
+  | 'student-id' 
+  | 'phone' 
+  | 'wallet' 
+  | 'laptop' 
+  | 'books' 
+  | 'keys' 
+  | 'others'
+
+export type LostFoundStatus = 'active' | 'claimed' | 'resolved'
 
 export interface LostFoundItem {
   id: string
   title: string
   description: string
   type: 'lost' | 'found'
+  category: LostFoundCategory
   location: string
   date: Date
   contactInfo: string
-  image?: string
-  status: 'active' | 'resolved'
+  imageUrl?: string
+  status: LostFoundStatus
   submittedBy: User
+  claimedBy?: User
   createdAt: Date
+}
+
+export interface ItemClaim {
+  id: string
+  itemId: string
+  claimantName: string
+  studentId: string
+  proofOfOwnership: string
+  description: string
+  status: 'pending' | 'approved' | 'rejected'
+  createdAt: Date
+}
+
+export interface SupportService {
+  id: string
+  name: string
+  description: string
+  icon: string
+  contactPhone?: string
+  contactEmail?: string
+  location?: string
+  hours?: string
 }
 
 export type NotificationType = 'academic' | 'administrative' | 'event' | 'scholarship' | 'system'
@@ -114,7 +175,7 @@ export interface CourseUpdate {
 
 export interface SearchResult {
   id: string
-  type: 'announcement' | 'course' | 'event' | 'notification'
+  type: 'announcement' | 'course' | 'event' | 'notification' | 'complaint' | 'lost-found'
   title: string
   description: string
   url: string

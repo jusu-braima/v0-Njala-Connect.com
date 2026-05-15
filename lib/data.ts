@@ -1,4 +1,15 @@
-import { Faculty, Announcement, Notification, Course, CourseUpdate } from './types'
+import { 
+  Faculty, 
+  Announcement, 
+  Notification, 
+  Course, 
+  CourseUpdate, 
+  Complaint, 
+  LostFoundItem, 
+  SupportService,
+  ComplaintCategory,
+  LostFoundCategory
+} from './types'
 
 export const faculties: Faculty[] = [
   {
@@ -331,4 +342,314 @@ export const notificationTypes = [
   { id: 'event', label: 'Events' },
   { id: 'scholarship', label: 'Scholarships' },
   { id: 'system', label: 'System' },
+] as const
+
+// Complaint categories with metadata
+export const complaintCategories: { id: ComplaintCategory; label: string; description: string; icon: string }[] = [
+  { id: 'hostel', label: 'Hostel Issues', description: 'Room, furniture, or accommodation problems', icon: 'building' },
+  { id: 'electricity', label: 'Electricity Problems', description: 'Power outages, faulty wiring, or lighting', icon: 'zap' },
+  { id: 'water', label: 'Water Supply', description: 'Water shortage, plumbing, or drainage issues', icon: 'droplets' },
+  { id: 'internet', label: 'Internet/Network', description: 'WiFi, connectivity, or network problems', icon: 'wifi' },
+  { id: 'academic', label: 'Academic Issues', description: 'Course, grades, or lecturer concerns', icon: 'graduation-cap' },
+  { id: 'security', label: 'Security Concerns', description: 'Safety, theft, or security incidents', icon: 'shield' },
+]
+
+// Lost & Found categories
+export const lostFoundCategories: { id: LostFoundCategory; label: string }[] = [
+  { id: 'student-id', label: 'Student ID' },
+  { id: 'phone', label: 'Phone' },
+  { id: 'wallet', label: 'Wallet' },
+  { id: 'laptop', label: 'Laptop' },
+  { id: 'books', label: 'Books' },
+  { id: 'keys', label: 'Keys' },
+  { id: 'others', label: 'Others' },
+]
+
+// Mock user for complaints/lost-found
+const mockUser = {
+  id: 'user-1',
+  fullName: 'Fatmata Kamara',
+  email: 'fatmata.kamara@njala.edu.sl',
+  role: 'student' as const,
+  studentId: 'NJU/2022/0456',
+  faculty: 'basic-sciences',
+  department: 'mathematics',
+  yearOfStudy: 3,
+  createdAt: new Date(),
+  updatedAt: new Date(),
+}
+
+// Mock Complaints Data
+export const mockComplaints: Complaint[] = [
+  {
+    id: 'c1',
+    title: 'No Water in Block A Hostel',
+    description: 'There has been no water supply in Block A for the past 3 days. Students are struggling to maintain hygiene. This is urgent and needs immediate attention.',
+    category: 'water',
+    status: 'in-progress',
+    priority: 'urgent',
+    location: 'Block A Hostel, Njala Campus',
+    submittedBy: mockUser,
+    assignedTo: 'Maintenance Team',
+    timeline: [
+      {
+        id: 't1',
+        complaintId: 'c1',
+        status: 'pending',
+        message: 'Complaint submitted',
+        updatedBy: 'System',
+        createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000),
+      },
+      {
+        id: 't2',
+        complaintId: 'c1',
+        status: 'in-progress',
+        message: 'Issue assigned to maintenance team. Plumber will inspect the water tank.',
+        updatedBy: 'Admin',
+        createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
+      },
+    ],
+    createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000),
+    updatedAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
+  },
+  {
+    id: 'c2',
+    title: 'WiFi Not Working in Library',
+    description: 'The WiFi connection in the university library has been extremely slow and keeps disconnecting. This is affecting our ability to do research.',
+    category: 'internet',
+    status: 'pending',
+    priority: 'high',
+    location: 'University Library',
+    submittedBy: mockUser,
+    timeline: [
+      {
+        id: 't3',
+        complaintId: 'c2',
+        status: 'pending',
+        message: 'Complaint submitted',
+        updatedBy: 'System',
+        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+      },
+    ],
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    updatedAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+  },
+  {
+    id: 'c3',
+    title: 'Broken Window in Room 205',
+    description: 'The window in my room has been broken and needs replacement. It poses a security risk and lets in rain during storms.',
+    category: 'hostel',
+    status: 'resolved',
+    priority: 'medium',
+    location: 'Block B, Room 205',
+    submittedBy: mockUser,
+    assignedTo: 'Hostel Administrator',
+    timeline: [
+      {
+        id: 't4',
+        complaintId: 'c3',
+        status: 'pending',
+        message: 'Complaint submitted',
+        updatedBy: 'System',
+        createdAt: new Date(Date.now() - 168 * 60 * 60 * 1000),
+      },
+      {
+        id: 't5',
+        complaintId: 'c3',
+        status: 'in-progress',
+        message: 'Maintenance scheduled for inspection',
+        updatedBy: 'Hostel Admin',
+        createdAt: new Date(Date.now() - 120 * 60 * 60 * 1000),
+      },
+      {
+        id: 't6',
+        complaintId: 'c3',
+        status: 'resolved',
+        message: 'Window replaced successfully. Issue resolved.',
+        updatedBy: 'Maintenance Team',
+        createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
+      },
+    ],
+    createdAt: new Date(Date.now() - 168 * 60 * 60 * 1000),
+    updatedAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
+  },
+  {
+    id: 'c4',
+    title: 'Streetlights Not Working',
+    description: 'Multiple streetlights along the path from the hostels to the main campus are not functioning. This is a safety concern especially for late-night classes.',
+    category: 'electricity',
+    status: 'pending',
+    priority: 'high',
+    location: 'Hostel to Campus Pathway',
+    submittedBy: mockUser,
+    timeline: [
+      {
+        id: 't7',
+        complaintId: 'c4',
+        status: 'pending',
+        message: 'Complaint submitted',
+        updatedBy: 'System',
+        createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
+      },
+    ],
+    createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
+    updatedAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
+  },
+]
+
+// Mock Lost & Found Data
+export const mockLostItems: LostFoundItem[] = [
+  {
+    id: 'l1',
+    title: 'Student ID Card - Mohamed S.',
+    description: 'Blue Njala University student ID card. Name: Mohamed Sesay. Department of Agriculture.',
+    type: 'lost',
+    category: 'student-id',
+    location: 'Main Library',
+    date: new Date(Date.now() - 24 * 60 * 60 * 1000),
+    contactInfo: '076-123-4567',
+    status: 'active',
+    submittedBy: mockUser,
+    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
+  },
+  {
+    id: 'l2',
+    title: 'Black Samsung Phone',
+    description: 'Samsung Galaxy A54 with cracked screen protector. Has a blue phone case.',
+    type: 'lost',
+    category: 'phone',
+    location: 'Lecture Hall 2',
+    date: new Date(Date.now() - 48 * 60 * 60 * 1000),
+    contactInfo: '078-987-6543',
+    status: 'active',
+    submittedBy: mockUser,
+    createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
+  },
+  {
+    id: 'l3',
+    title: 'Brown Leather Wallet',
+    description: 'Small brown leather wallet containing student ID and some cash. Lost near cafeteria.',
+    type: 'lost',
+    category: 'wallet',
+    location: 'University Cafeteria',
+    date: new Date(Date.now() - 72 * 60 * 60 * 1000),
+    contactInfo: '077-456-7890',
+    status: 'claimed',
+    submittedBy: mockUser,
+    createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000),
+  },
+]
+
+export const mockFoundItems: LostFoundItem[] = [
+  {
+    id: 'f1',
+    title: 'Set of Keys with Blue Keychain',
+    description: 'Found a set of 3 keys with a blue Njala University keychain near the admin building.',
+    type: 'found',
+    category: 'keys',
+    location: 'Administration Building',
+    date: new Date(Date.now() - 6 * 60 * 60 * 1000),
+    contactInfo: 'Student Affairs Office',
+    status: 'active',
+    submittedBy: mockUser,
+    createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
+  },
+  {
+    id: 'f2',
+    title: 'HP Laptop Charger',
+    description: 'Black HP laptop charger found in Computer Lab 1. 65W power adapter.',
+    type: 'found',
+    category: 'laptop',
+    location: 'Computer Lab 1',
+    date: new Date(Date.now() - 12 * 60 * 60 * 1000),
+    contactInfo: 'ICT Help Desk',
+    status: 'active',
+    submittedBy: mockUser,
+    createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
+  },
+  {
+    id: 'f3',
+    title: 'Introduction to Programming Textbook',
+    description: 'CSC 101 textbook found in Lecture Hall 3. Has name written inside cover.',
+    type: 'found',
+    category: 'books',
+    location: 'Lecture Hall 3',
+    date: new Date(Date.now() - 36 * 60 * 60 * 1000),
+    contactInfo: '076-555-1234',
+    status: 'resolved',
+    submittedBy: mockUser,
+    createdAt: new Date(Date.now() - 36 * 60 * 60 * 1000),
+  },
+]
+
+// Support Services
+export const supportServices: SupportService[] = [
+  {
+    id: 'ict',
+    name: 'ICT Support',
+    description: 'Technical support for internet, email, and computer issues',
+    icon: 'monitor',
+    contactPhone: '076-ICT-HELP',
+    contactEmail: 'ict@njala.edu.sl',
+    location: 'ICT Building, Ground Floor',
+    hours: 'Mon-Fri: 8:00 AM - 5:00 PM',
+  },
+  {
+    id: 'hostel',
+    name: 'Hostel Administration',
+    description: 'Accommodation, room allocation, and hostel-related concerns',
+    icon: 'building',
+    contactPhone: '076-HOST-001',
+    contactEmail: 'hostel@njala.edu.sl',
+    location: 'Student Affairs Building',
+    hours: 'Mon-Fri: 9:00 AM - 4:00 PM',
+  },
+  {
+    id: 'student-affairs',
+    name: 'Student Affairs',
+    description: 'Student welfare, counseling, and general student services',
+    icon: 'users',
+    contactPhone: '076-STU-AFRS',
+    contactEmail: 'studentaffairs@njala.edu.sl',
+    location: 'Administration Block, 2nd Floor',
+    hours: 'Mon-Fri: 8:00 AM - 4:00 PM',
+  },
+  {
+    id: 'academic',
+    name: 'Academic Affairs',
+    description: 'Course registration, transcripts, and academic records',
+    icon: 'graduation-cap',
+    contactPhone: '076-ACA-DMCS',
+    contactEmail: 'academics@njala.edu.sl',
+    location: 'Academic Registry Building',
+    hours: 'Mon-Fri: 9:00 AM - 3:00 PM',
+  },
+  {
+    id: 'security',
+    name: 'Security Office',
+    description: 'Campus safety, incident reporting, and emergency assistance',
+    icon: 'shield',
+    contactPhone: '076-SEC-RITY',
+    contactEmail: 'security@njala.edu.sl',
+    location: 'Main Gate Security Post',
+    hours: '24/7 Available',
+  },
+  {
+    id: 'health',
+    name: 'Health Center',
+    description: 'Medical services, health consultations, and first aid',
+    icon: 'heart-pulse',
+    contactPhone: '076-HEL-THCR',
+    contactEmail: 'health@njala.edu.sl',
+    location: 'Campus Health Center',
+    hours: 'Mon-Sat: 8:00 AM - 8:00 PM',
+  },
+]
+
+// Priority levels for complaints
+export const priorityLevels = [
+  { id: 'low', label: 'Low', description: 'Minor issue, no urgency' },
+  { id: 'medium', label: 'Medium', description: 'Moderate impact, can wait' },
+  { id: 'high', label: 'High', description: 'Significant impact, needs attention' },
+  { id: 'urgent', label: 'Urgent', description: 'Critical issue, immediate action required' },
 ] as const
