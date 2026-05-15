@@ -45,27 +45,28 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <div className="flex items-center p-4">
+      <div className="flex items-center p-4 border-b border-border">
         <Link href="/">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="text-foreground">
             <ArrowLeft className="w-5 h-5" />
             <span className="sr-only">Go back</span>
           </Button>
         </Link>
+        <h1 className="flex-1 text-center text-lg font-semibold text-foreground pr-10">Login</h1>
       </div>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col px-6 pb-8">
+      <div className="flex-1 flex flex-col px-6 py-8">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <Logo size="lg" />
+          <Logo size="lg" variant="dark" />
         </div>
 
         {/* Form */}
-        <div className="space-y-6">
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold text-foreground">Welcome Back</h1>
-            <p className="text-muted-foreground">Sign in to continue to NjalaConnect</p>
+        <div className="space-y-6 max-w-sm mx-auto w-full">
+          <div className="text-center space-y-1">
+            <h2 className="text-xl font-semibold text-foreground">Welcome Back</h2>
+            <p className="text-sm text-muted-foreground">Sign in to continue to NjalaConnect</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -76,20 +77,20 @@ export default function LoginPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">Student ID or Email</Label>
+              <Label htmlFor="email" className="text-foreground">Student ID or Email</Label>
               <Input
                 id="email"
                 type="text"
                 placeholder="e.g., NU2024001 or email@njala.edu.sl"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="h-12 rounded-xl"
+                className="h-12 rounded-xl bg-background border-input"
                 disabled={isLoading}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-foreground">Password</Label>
               <div className="relative">
                 <Input
                   id="password"
@@ -97,7 +98,7 @@ export default function LoginPage() {
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-12 rounded-xl pr-12"
+                  className="h-12 rounded-xl pr-12 bg-background border-input"
                   disabled={isLoading}
                 />
                 <Button
@@ -127,8 +128,9 @@ export default function LoginPage() {
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(checked as boolean)}
                   disabled={isLoading}
+                  className="border-primary data-[state=checked]:bg-primary"
                 />
-                <Label htmlFor="remember" className="text-sm font-normal cursor-pointer">
+                <Label htmlFor="remember" className="text-sm font-normal cursor-pointer text-foreground">
                   Remember me
                 </Label>
               </div>
@@ -143,7 +145,7 @@ export default function LoginPage() {
             <Button
               type="submit"
               size="lg"
-              className="w-full h-14 text-base font-semibold rounded-xl"
+              className="w-full h-14 text-base font-semibold rounded-xl bg-primary hover:bg-primary/90"
               disabled={isLoading}
             >
               {isLoading ? <LoadingSpinner size="sm" /> : 'Login'}
@@ -151,7 +153,7 @@ export default function LoginPage() {
           </form>
 
           <div className="text-center">
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {"Don't have an account? "}
               <Link href="/register" className="text-primary font-medium hover:underline">
                 Create Account

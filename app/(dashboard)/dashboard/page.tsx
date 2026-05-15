@@ -8,9 +8,10 @@ import {
   Megaphone, 
   CalendarDays, 
   MessageSquareWarning, 
-  Search, 
-  Briefcase, 
+  SearchX, 
   BookOpen,
+  Star,
+  ChevronRight,
   LucideIcon
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -19,61 +20,59 @@ import Link from 'next/link'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { mockAnnouncements } from '@/lib/data'
+import { formatDistanceToNow } from 'date-fns'
 
 interface QuickAction {
   title: string
-  description: string
   icon: LucideIcon
   href: string
-  count?: number
   color: string
+  iconColor: string
 }
 
 const quickActions: QuickAction[] = [
   {
     title: 'Announcements',
-    description: 'Latest campus news',
     icon: Megaphone,
     href: '/announcements',
-    count: 5,
-    color: 'bg-blue-500/10 text-blue-600',
+    color: 'bg-primary/10',
+    iconColor: 'text-primary',
   },
   {
     title: 'Course Updates',
-    description: 'Academic notices',
     icon: BookOpen,
     href: '/courses',
-    count: 3,
-    color: 'bg-emerald-500/10 text-emerald-600',
+    color: 'bg-primary/10',
+    iconColor: 'text-primary',
   },
   {
     title: 'Complaints',
-    description: 'Report issues',
     icon: MessageSquareWarning,
     href: '/complaints',
-    color: 'bg-amber-500/10 text-amber-600',
+    color: 'bg-primary/10',
+    iconColor: 'text-primary',
   },
   {
     title: 'Lost & Found',
-    description: 'Find or report items',
-    icon: Search,
+    icon: SearchX,
     href: '/lost-found',
-    color: 'bg-purple-500/10 text-purple-600',
+    color: 'bg-primary/10',
+    iconColor: 'text-primary',
   },
   {
     title: 'Events',
-    description: 'Campus activities',
     icon: CalendarDays,
     href: '/events',
-    count: 2,
-    color: 'bg-rose-500/10 text-rose-600',
+    color: 'bg-primary/10',
+    iconColor: 'text-primary',
   },
   {
     title: 'Opportunities',
-    description: 'Jobs & internships',
-    icon: Briefcase,
+    icon: Star,
     href: '/opportunities',
-    color: 'bg-teal-500/10 text-teal-600',
+    color: 'bg-primary/10',
+    iconColor: 'text-primary',
   },
 ]
 
@@ -82,26 +81,57 @@ function QuickActionCard({ action }: { action: QuickAction }) {
 
   return (
     <Link href={action.href}>
-      <Card className="h-full hover:shadow-md transition-all hover:scale-[1.02] cursor-pointer group">
-        <CardContent className="p-4 flex flex-col h-full">
-          <div className="flex items-start justify-between mb-3">
-            <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', action.color)}>
-              <Icon className="w-5 h-5" />
-            </div>
-            {action.count && action.count > 0 && (
-              <Badge className="bg-primary text-primary-foreground text-xs">
-                {action.count}
-              </Badge>
-            )}
+      <Card className="h-full hover:shadow-md transition-all hover:scale-[1.02] cursor-pointer group border border-border">
+        <CardContent className="p-4 flex flex-col items-center text-center">
+          <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center mb-2', action.color)}>
+            <Icon className={cn('w-6 h-6', action.iconColor)} />
           </div>
-          <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+          <h3 className="text-xs font-medium text-foreground">
             {action.title}
           </h3>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            {action.description}
-          </p>
         </CardContent>
       </Card>
+    </Link>
+  )
+}
+
+// Category badge colors
+const categoryColors: Record<string, string> = {
+  academic: 'bg-primary text-primary-foreground',
+  administrative: 'bg-muted text-muted-foreground',
+  event: 'bg-success/15 text-success',
+  scholarship: 'bg-warning/15 text-warning',
+  general: 'bg-muted text-foreground',
+}
+
+function AnnouncementItem({ announcement }: { announcement: typeof mockAnnouncements[0] }) {
+  const categoryLabel = announcement.category.charAt(0).toUpperCase() + announcement.category.slice(1)
+  
+  return (
+    <Link href={`/announcements/${announcement.id}`}>
+      <div className="py-3 border-b border-border last:border-0 hover:bg-muted/30 px-1 -mx-1 rounded transition-colors">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <Badge className={cn('text-[10px] font-medium h-5', categoryColors[announcement.category] || categoryColors.general)}>
+                {categoryLabel.toUpperCase()}
+              </Badge>
+              <span className="text-xs text-muted-foreground">
+                {formatDistanceToNow(announcement.createdAt, { addSuffix: true })}
+              </span>
+            </div>
+            <h4 className="font-medium text-sm text-foreground line-clamp-2 mb-1">
+              {announcement.title}
+            </h4>
+            <p className="text-xs text-muted-foreground line-clamp-2">
+              {announcement.summary}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1">
+              By: {announcement.author}
+            </p>
+          </div>
+        </div>
+      </div>
     </Link>
   )
 }
@@ -110,6 +140,9 @@ export default function DashboardPage() {
   const { user, isAuthenticated } = useAuth()
   const router = useRouter()
   const [notificationCount, setNotificationCount] = useState(8)
+
+  // Get latest 3 announcements
+  const latestAnnouncements = mockAnnouncements.slice(0, 3)
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -125,23 +158,38 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background pb-20">
       <DashboardHeader notificationCount={notificationCount} />
 
-      <main className="px-4 py-6 max-w-lg mx-auto">
+      <main className="px-4 py-4 max-w-lg mx-auto">
         {/* Welcome Banner */}
-        <div className="mb-6">
+        <div className="mb-5">
           <WelcomeBanner userName={user?.fullName} />
         </div>
 
-        {/* Section Title */}
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold text-foreground">Quick Access</h2>
-          <p className="text-sm text-muted-foreground">What would you like to do today?</p>
+        {/* Quick Access Section */}
+        <div className="mb-5">
+          <h2 className="text-base font-semibold text-foreground mb-3">Quick Access</h2>
+          <div className="grid grid-cols-3 gap-3">
+            {quickActions.map((action) => (
+              <QuickActionCard key={action.href} action={action} />
+            ))}
+          </div>
         </div>
 
-        {/* 2x3 Quick Actions Grid */}
-        <div className="grid grid-cols-2 gap-3">
-          {quickActions.map((action) => (
-            <QuickActionCard key={action.href} action={action} />
-          ))}
+        {/* Latest Announcements Section */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-base font-semibold text-foreground">Latest Announcement</h2>
+            <Link href="/announcements" className="text-sm text-primary font-medium flex items-center gap-1 hover:underline">
+              View all
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <Card className="border border-border">
+            <CardContent className="p-3">
+              {latestAnnouncements.map((announcement) => (
+                <AnnouncementItem key={announcement.id} announcement={announcement} />
+              ))}
+            </CardContent>
+          </Card>
         </div>
       </main>
 

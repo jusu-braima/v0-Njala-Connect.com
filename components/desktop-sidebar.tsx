@@ -11,7 +11,11 @@ import {
   Search,
   CalendarDays,
   MessageSquareWarning,
-  Settings
+  Settings,
+  SearchX,
+  HeadphonesIcon,
+  Gift,
+  Users
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Logo } from '@/components/logo'
@@ -27,7 +31,11 @@ const mainNavItems = [
   { href: '/notifications', icon: Bell, label: 'Notifications' },
   { href: '/courses', icon: BookOpen, label: 'Courses' },
   { href: '/events', icon: CalendarDays, label: 'Events' },
+  { href: '/opportunities', icon: Gift, label: 'Opportunities' },
+  { href: '/organizations', icon: Users, label: 'Organizations' },
   { href: '/complaints', icon: MessageSquareWarning, label: 'Complaints' },
+  { href: '/lost-found', icon: SearchX, label: 'Lost & Found' },
+  { href: '/support', icon: HeadphonesIcon, label: 'Support' },
 ]
 
 const secondaryNavItems = [

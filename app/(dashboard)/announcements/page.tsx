@@ -2,26 +2,30 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { BottomNav } from '@/components/bottom-nav'
-import { CategoryTabs } from '@/components/category-tabs'
 import { AnnouncementCard } from '@/components/announcement-card'
-import { SearchBar } from '@/components/search-bar'
 import { EmptyState } from '@/components/empty-state'
 import { SkeletonList } from '@/components/skeleton-cards'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
-import { mockAnnouncements, announcementCategories } from '@/lib/data'
-import { AnnouncementCategory } from '@/lib/types'
-import { Search, SlidersHorizontal, ArrowLeft } from 'lucide-react'
+import { mockAnnouncements } from '@/lib/data'
+import { Filter, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
+import { cn } from '@/lib/utils'
+
+const categories = [
+  { id: 'all', label: 'All' },
+  { id: 'academic', label: 'Exams' },
+  { id: 'general', label: 'General' },
+  { id: 'event', label: 'Events' },
+  { id: 'scholarship', label: 'Scholarships' },
+]
 
 export default function AnnouncementsPage() {
   const { isAuthenticated } = useAuth()
   const router = useRouter()
   const [activeCategory, setActiveCategory] = useState<string>('all')
-  const [searchQuery, setSearchQuery] = useState('')
   const [isLoading, setIsLoading] = useState(true)
-  const [showSearch, setShowSearch] = useState(false)
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -36,34 +40,15 @@ export default function AnnouncementsPage() {
   }, [])
 
   const filteredAnnouncements = useMemo(() => {
-    let filtered = mockAnnouncements
-
-    // Filter by category
-    if (activeCategory !== 'all') {
-      filtered = filtered.filter(a => a.category === activeCategory)
-    }
-
-    // Filter by search
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(
-        a =>
-          a.title.toLowerCase().includes(query) ||
-          a.content.toLowerCase().includes(query) ||
-          a.department.toLowerCase().includes(query)
-      )
-    }
-
-    return filtered
-  }, [activeCategory, searchQuery])
+    if (activeCategory === 'all') return mockAnnouncements
+    return mockAnnouncements.filter(a => a.category === activeCategory)
+  }, [activeCategory])
 
   const handleBookmark = (id: string) => {
-    // TODO: Implement bookmark functionality
     console.log('Bookmark:', id)
   }
 
   const handleShare = (id: string) => {
-    // TODO: Implement share functionality
     if (navigator.share) {
       navigator.share({
         title: 'Announcement',
@@ -72,8 +57,6 @@ export default function AnnouncementsPage() {
     }
   }
 
-  const unreadCount = 3 // Mock unread count
-
   if (!isAuthenticated) {
     return null
   }
@@ -81,57 +64,41 @@ export default function AnnouncementsPage() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+      <header className="sticky top-0 z-40 bg-primary">
         <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
-          {showSearch ? (
-            <div className="flex items-center gap-2 w-full">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => {
-                  setShowSearch(false)
-                  setSearchQuery('')
-                }}
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-              <SearchBar
-                placeholder="Search announcements..."
-                value={searchQuery}
-                onChange={setSearchQuery}
-                className="flex-1"
-                recentSearches={['Examination', 'Registration', 'Scholarship']}
-                suggestions={['Exam timetable', 'Course registration', 'Library hours']}
-              />
-            </div>
-          ) : (
-            <>
-              <div>
-                <h1 className="text-xl font-bold text-foreground">Announcements</h1>
-              </div>
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" onClick={() => setShowSearch(true)}>
-                  <Search className="w-5 h-5" />
-                </Button>
-                <Button variant="ghost" size="icon">
-                  <SlidersHorizontal className="w-5 h-5" />
-                </Button>
-              </div>
-            </>
-          )}
+          <Link href="/dashboard">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          </Link>
+          <h1 className="text-lg font-semibold text-white">Announcements</h1>
+          <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <Filter className="w-5 h-5" />
+          </Button>
         </div>
-
-        {/* Category Tabs */}
-        {!showSearch && (
-          <div className="px-4 pb-3 max-w-lg mx-auto">
-            <CategoryTabs
-              categories={announcementCategories}
-              activeCategory={activeCategory}
-              onCategoryChange={setActiveCategory}
-            />
-          </div>
-        )}
       </header>
+
+      {/* Category Pills */}
+      <div className="bg-background border-b border-border sticky top-14 z-30">
+        <div className="px-4 py-3 max-w-lg mx-auto">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={cn(
+                  'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
+                  activeCategory === cat.id
+                    ? 'bg-primary text-white'
+                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                )}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <main className="px-4 py-4 max-w-lg mx-auto">
         {isLoading ? (
@@ -149,26 +116,14 @@ export default function AnnouncementsPage() {
           </div>
         ) : (
           <EmptyState
-            icon="inbox"
+            icon="megaphone"
             title="No Announcements Found"
-            description={
-              searchQuery
-                ? `No results for "${searchQuery}". Try a different search term.`
-                : 'There are no announcements in this category yet.'
-            }
-            action={
-              searchQuery
-                ? {
-                    label: 'Clear Search',
-                    onClick: () => setSearchQuery(''),
-                  }
-                : undefined
-            }
+            description="There are no announcements in this category yet."
           />
         )}
       </main>
 
-      <BottomNav notificationCount={unreadCount} />
+      <BottomNav />
     </div>
   )
 }
