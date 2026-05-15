@@ -21,7 +21,9 @@ import {
   AlertTriangle,
   ChevronRight,
   Users,
-  TrendingUp
+  TrendingUp,
+  CalendarDays,
+  Gift
 } from 'lucide-react'
 
 export default function AdminDashboardPage() {
@@ -197,6 +199,42 @@ export default function AdminDashboardPage() {
                       <div className="flex items-center gap-1.5 text-xs">
                         <CheckCircle className="w-3.5 h-3.5 text-primary" />
                         <span className="text-muted-foreground">{lostFoundStats.resolved} resolved</span>
+                      </div>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          {/* Engagement Dashboard */}
+          <Link href="/admin/engagement">
+            <Card className="hover:shadow-md transition-all hover:scale-[1.01] cursor-pointer group">
+              <CardContent className="p-5">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-success/10 flex items-center justify-center flex-shrink-0">
+                    <CalendarDays className="w-7 h-7 text-success" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">
+                      Engagement Dashboard
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Manage events, opportunities, and organizations
+                    </p>
+                    <div className="flex items-center gap-4 mt-2">
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <CalendarDays className="w-3.5 h-3.5 text-primary" />
+                        <span className="text-muted-foreground">Events</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <Gift className="w-3.5 h-3.5 text-warning" />
+                        <span className="text-muted-foreground">Opportunities</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs">
+                        <Users className="w-3.5 h-3.5 text-success" />
+                        <span className="text-muted-foreground">Organizations</span>
                       </div>
                     </div>
                   </div>

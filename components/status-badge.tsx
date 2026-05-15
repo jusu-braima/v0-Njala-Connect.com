@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import { ComplaintStatus, LostFoundStatus, ComplaintPriority } from '@/lib/types'
+import { ComplaintStatus, LostFoundStatus, ComplaintPriority, EventCategory, OpportunityCategory } from '@/lib/types'
 
 interface StatusBadgeProps {
   status: ComplaintStatus | LostFoundStatus
@@ -104,6 +104,33 @@ export function TypeBadge({ type, className }: TypeBadgeProps) {
       )}
     >
       {type === 'lost' ? 'Lost' : 'Found'}
+    </Badge>
+  )
+}
+
+interface EventCategoryBadgeProps {
+  category: EventCategory
+  className?: string
+}
+
+const eventCategoryLabels: Record<EventCategory, string> = {
+  'academic': 'Academic',
+  'innovation': 'Innovation',
+  'student-org': 'Student Org',
+  'sports': 'Sports',
+  'religious': 'Religious',
+  'entertainment': 'Entertainment',
+  'career': 'Career',
+  'community': 'Community',
+}
+
+export function EventCategoryBadge({ category, className }: EventCategoryBadgeProps) {
+  return (
+    <Badge
+      variant="outline"
+      className={cn('font-medium bg-primary/15 text-primary border-primary/30', className)}
+    >
+      {eventCategoryLabels[category]}
     </Badge>
   )
 }

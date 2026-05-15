@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { DashboardHeader } from '@/components/dashboard-header'
 import { BottomNav } from '@/components/bottom-nav'
-import { EventCard, EventCardSkeleton } from '@/components/event-card'
+import { OpportunityCard, OpportunityCardSkeleton } from '@/components/opportunity-card'
 import { FilterDropdown } from '@/components/filter-dropdown'
 import { EmptyState } from '@/components/empty-state'
 import { Button } from '@/components/ui/button'
@@ -12,23 +12,21 @@ import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
-import { mockEvents, eventCategories } from '@/lib/data'
+import { mockOpportunities, opportunityCategories } from '@/lib/data'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import {
   Search,
-  Calendar,
-  ChevronRight,
-  Bookmark,
-  Filter
+  Gift,
+  Bookmark
 } from 'lucide-react'
 
-export default function EventsPage() {
+export default function OpportunitiesPage() {
   const { isAuthenticated } = useAuth()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('all')
-  const [dateFilter, setDateFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all')
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -36,43 +34,39 @@ export default function EventsPage() {
     }
   }, [isAuthenticated, router])
 
-  // Featured events
-  const featuredEvents = useMemo(() => {
-    return mockEvents.filter(e => e.isFeatured && e.status === 'upcoming').slice(0, 3)
-  }, [])
-
-  // Filter events
-  const filteredEvents = useMemo(() => {
-    return mockEvents.filter(event => {
+  // Filter opportunities
+  const filteredOpportunities = useMemo(() => {
+    return mockOpportunities.filter(opp => {
       // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase()
-        if (!event.title.toLowerCase().includes(query) && 
-            !event.description.toLowerCase().includes(query) &&
-            !event.organizer.toLowerCase().includes(query)) {
+        if (!opp.title.toLowerCase().includes(query) && 
+            !opp.description.toLowerCase().includes(query) &&
+            !opp.provider.toLowerCase().includes(query)) {
           return false
         }
       }
       
       // Category filter
-      if (categoryFilter !== 'all' && event.category !== categoryFilter) {
+      if (categoryFilter !== 'all' && opp.category !== categoryFilter) {
         return false
       }
       
-      // Date filter
-      if (dateFilter !== 'all') {
-        const now = new Date()
-        const eventDate = new Date(event.startDate)
-        const diffDays = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
-        
-        if (dateFilter === 'today' && diffDays !== 0) return false
-        if (dateFilter === 'this-week' && (diffDays < 0 || diffDays > 7)) return false
-        if (dateFilter === 'this-month' && (diffDays < 0 || diffDays > 30)) return false
+      // Status filter
+      if (statusFilter !== 'all' && opp.status !== statusFilter) {
+        return false
       }
       
       return true
     })
-  }, [searchQuery, categoryFilter, dateFilter])
+  }, [searchQuery, categoryFilter, statusFilter])
+
+  // Count by status
+  const stats = useMemo(() => ({
+    open: mockOpportunities.filter(o => o.status === 'open').length,
+    closingSoon: mockOpportunities.filter(o => o.status === 'closing-soon').length,
+    closed: mockOpportunities.filter(o => o.status === 'closed').length,
+  }), [])
 
   if (!isAuthenticated) {
     return null
@@ -85,9 +79,9 @@ export default function EventsPage() {
       <main className="px-4 py-6 max-w-lg mx-auto">
         {/* Page Header */}
         <div className="mb-6">
-          <h1 className="text-xl font-bold text-foreground">Campus Events</h1>
+          <h1 className="text-xl font-bold text-foreground">Campus Opportunities</h1>
           <p className="text-sm text-muted-foreground">
-            Discover programs, meetings, workshops, and activities happening at Njala Campus.
+            Scholarships, internships, competitions, trainings, and leadership opportunities.
           </p>
         </div>
 
@@ -96,67 +90,57 @@ export default function EventsPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             type="search"
-            placeholder="Search events..."
+            placeholder="Search opportunities..."
             className="pl-10"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
-        {/* Filters */}
+        {/* Status Quick Filters */}
+        <div className="flex gap-2 mb-4">
+          <Badge
+            variant={statusFilter === 'all' ? 'default' : 'outline'}
+            className="cursor-pointer"
+            onClick={() => setStatusFilter('all')}
+          >
+            All ({mockOpportunities.length})
+          </Badge>
+          <Badge
+            variant={statusFilter === 'open' ? 'default' : 'outline'}
+            className="cursor-pointer bg-success/15 text-success border-success/30 hover:bg-success/25"
+            onClick={() => setStatusFilter('open')}
+          >
+            Open ({stats.open})
+          </Badge>
+          <Badge
+            variant={statusFilter === 'closing-soon' ? 'default' : 'outline'}
+            className="cursor-pointer bg-destructive/15 text-destructive border-destructive/30 hover:bg-destructive/25"
+            onClick={() => setStatusFilter('closing-soon')}
+          >
+            Closing Soon ({stats.closingSoon})
+          </Badge>
+        </div>
+
+        {/* Category Filters */}
         <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-1">
           <FilterDropdown
             label="Category"
             value={categoryFilter}
             options={[
               { value: 'all', label: 'All Categories' },
-              ...eventCategories.map(c => ({ value: c.id, label: c.label }))
+              ...opportunityCategories.map(c => ({ value: c.id, label: c.label }))
             ]}
             onChange={setCategoryFilter}
           />
-          <FilterDropdown
-            label="Date"
-            value={dateFilter}
-            options={[
-              { value: 'all', label: 'All Dates' },
-              { value: 'today', label: 'Today' },
-              { value: 'this-week', label: 'This Week' },
-              { value: 'this-month', label: 'This Month' },
-            ]}
-            onChange={setDateFilter}
-          />
         </div>
-
-        {/* Featured Events */}
-        {featuredEvents.length > 0 && !searchQuery && categoryFilter === 'all' && (
-          <section className="mb-8">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-base font-semibold text-foreground">Featured Events</h2>
-              <Link href="/events/my-events">
-                <Button variant="ghost" size="sm" className="gap-1">
-                  <Bookmark className="w-4 h-4" />
-                  My Events
-                </Button>
-              </Link>
-            </div>
-            <div className="space-y-4">
-              {featuredEvents.map((event) => (
-                <EventCard 
-                  key={event.id} 
-                  event={event} 
-                  variant="featured"
-                />
-              ))}
-            </div>
-          </section>
-        )}
 
         {/* Category Quick Links */}
         {!searchQuery && categoryFilter === 'all' && (
-          <section className="mb-8">
+          <section className="mb-6">
             <h2 className="text-base font-semibold text-foreground mb-3">Browse by Category</h2>
             <div className="flex flex-wrap gap-2">
-              {eventCategories.map((category) => (
+              {opportunityCategories.map((category) => (
                 <Badge
                   key={category.id}
                   variant="outline"
@@ -170,13 +154,13 @@ export default function EventsPage() {
           </section>
         )}
 
-        {/* All Events */}
+        {/* Opportunities List */}
         <section>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-semibold text-foreground">
               {categoryFilter !== 'all' 
-                ? eventCategories.find(c => c.id === categoryFilter)?.label + ' Events'
-                : 'Upcoming Events'}
+                ? opportunityCategories.find(c => c.id === categoryFilter)?.label
+                : 'All Opportunities'}
             </h2>
             {categoryFilter !== 'all' && (
               <Button 
@@ -189,18 +173,18 @@ export default function EventsPage() {
             )}
           </div>
 
-          {filteredEvents.length === 0 ? (
+          {filteredOpportunities.length === 0 ? (
             <EmptyState
-              icon="event"
-              title="No events found"
-              description={searchQuery || categoryFilter !== 'all' || dateFilter !== 'all'
-                ? "Try adjusting your search or filters to find events."
-                : "No upcoming events at the moment. Check back soon!"}
+              icon="opportunity"
+              title="No opportunities found"
+              description={searchQuery || categoryFilter !== 'all' || statusFilter !== 'all'
+                ? "Try adjusting your search or filters to find opportunities."
+                : "No opportunities posted yet. Check back soon!"}
             />
           ) : (
             <div className="space-y-3">
-              {filteredEvents.map((event) => (
-                <EventCard key={event.id} event={event} />
+              {filteredOpportunities.map((opportunity) => (
+                <OpportunityCard key={opportunity.id} opportunity={opportunity} />
               ))}
             </div>
           )}

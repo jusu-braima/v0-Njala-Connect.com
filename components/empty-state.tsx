@@ -1,10 +1,10 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { FileQuestion, Inbox, Search, AlertCircle, Bell, BookOpen, Megaphone, CheckCircle, SearchX, Package } from 'lucide-react'
+import { FileQuestion, Inbox, Search, AlertCircle, Bell, BookOpen, Megaphone, CheckCircle, SearchX, Package, Calendar, Gift, Users } from 'lucide-react'
 
 interface EmptyStateProps {
-  icon?: 'inbox' | 'search' | 'file' | 'alert' | 'bell' | 'book' | 'megaphone' | 'check' | 'lost' | 'found'
+  icon?: 'inbox' | 'search' | 'file' | 'alert' | 'bell' | 'book' | 'megaphone' | 'check' | 'lost' | 'found' | 'event' | 'opportunity' | 'organization'
   title: string
   description?: string
   action?: {
@@ -25,6 +25,9 @@ const icons = {
   check: CheckCircle,
   lost: SearchX,
   found: Package,
+  event: Calendar,
+  opportunity: Gift,
+  organization: Users,
 }
 
 export function EmptyState({
