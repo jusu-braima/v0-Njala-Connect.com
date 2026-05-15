@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { 
   Home, 
   Megaphone, 
@@ -15,7 +15,9 @@ import {
   SearchX,
   HeadphonesIcon,
   Gift,
-  Users
+  Users,
+  LogOut,
+  Shield
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Logo } from '@/components/logo'
@@ -49,7 +51,13 @@ interface DesktopSidebarProps {
 
 export function DesktopSidebar({ notificationCount = 0 }: DesktopSidebarProps) {
   const pathname = usePathname()
-  const { user } = useAuth()
+  const router = useRouter()
+  const { profile, isAdmin, logout } = useAuth()
+
+  const handleLogout = async () => {
+    await logout()
+    router.push('/auth/login')
+  }
 
   return (
     <aside className="hidden lg:flex flex-col w-64 h-screen bg-background border-r border-border fixed left-0 top-0">
@@ -108,6 +116,22 @@ export function DesktopSidebar({ notificationCount = 0 }: DesktopSidebarProps) {
 
         <Separator className="my-4" />
 
+        {/* Admin Link */}
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className={cn(
+              'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-4',
+              pathname.startsWith('/admin')
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+            )}
+          >
+            <Shield className="w-5 h-5" />
+            <span>Admin Panel</span>
+          </Link>
+        )}
+
         <div className="space-y-1">
           {secondaryNavItems.map((item) => {
             const isActive = pathname === item.href
@@ -136,17 +160,30 @@ export function DesktopSidebar({ notificationCount = 0 }: DesktopSidebarProps) {
       <div className="p-4 border-t border-border">
         <Link href="/profile">
           <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted transition-colors">
-            <ProfileAvatar name={user?.fullName} image={user?.avatar} size="sm" />
+            <ProfileAvatar 
+              name={profile?.full_name || undefined} 
+              image={profile?.avatar_url || undefined} 
+              size="sm" 
+            />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground truncate">
-                {user?.fullName || 'User'}
+                {profile?.full_name || profile?.email || 'User'}
               </p>
               <div className="flex items-center gap-1">
-                {user?.role && <RoleBadge role={user.role} size="sm" />}
+                {profile?.role && <RoleBadge role={profile.role} size="sm" />}
               </div>
             </div>
           </div>
         </Link>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleLogout}
+          className="w-full mt-2 text-muted-foreground hover:text-destructive"
+        >
+          <LogOut className="w-4 h-4 mr-2" />
+          Sign Out
+        </Button>
       </div>
     </aside>
   )
