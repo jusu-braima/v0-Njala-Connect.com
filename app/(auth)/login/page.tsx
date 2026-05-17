@@ -160,6 +160,16 @@ export default function LoginPage() {
               </Link>
             </p>
           </div>
+
+          {/* Test Credentials Info */}
+          <div className="mt-6 p-4 rounded-xl bg-muted/50 border border-border">
+            <p className="text-xs font-medium text-muted-foreground mb-2">Test Credentials:</p>
+            <div className="space-y-1 text-xs text-muted-foreground">
+              <p><span className="font-medium">Student:</span> student@njala.edu.sl / student123</p>
+              <p><span className="font-medium">Staff:</span> staff@njala.edu.sl / staff123</p>
+              <p><span className="font-medium">Admin:</span> admin@njala.edu.sl / admin123</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
