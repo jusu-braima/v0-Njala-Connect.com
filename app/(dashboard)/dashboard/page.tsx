@@ -12,7 +12,8 @@ import {
   BookOpen,
   Star,
   ChevronRight,
-  LucideIcon
+  LucideIcon,
+  Bell
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -97,11 +98,11 @@ function QuickActionCard({ action }: { action: QuickAction }) {
 
 // Category badge colors
 const categoryColors: Record<string, string> = {
-  academic: 'bg-primary text-primary-foreground',
-  administrative: 'bg-muted text-muted-foreground',
-  event: 'bg-success/15 text-success',
-  scholarship: 'bg-warning/15 text-warning',
-  general: 'bg-muted text-foreground',
+  exams: 'bg-primary text-white',
+  registration: 'bg-blue-500 text-white',
+  events: 'bg-amber-500 text-white',
+  scholarships: 'bg-emerald-500 text-white',
+  general: 'bg-slate-500 text-white',
 }
 
 function AnnouncementItem({ announcement }: { announcement: typeof mockAnnouncements[0] }) {
@@ -113,20 +114,17 @@ function AnnouncementItem({ announcement }: { announcement: typeof mockAnnouncem
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <Badge className={cn('text-[10px] font-medium h-5', categoryColors[announcement.category] || categoryColors.general)}>
+              <Badge className={cn('text-[10px] font-medium h-5 rounded', categoryColors[announcement.category] || categoryColors.general)}>
                 {categoryLabel.toUpperCase()}
               </Badge>
               <span className="text-xs text-muted-foreground">
-                {formatDistanceToNow(announcement.createdAt, { addSuffix: true })}
+                {formatDistanceToNow(announcement.createdAt, { addSuffix: false })}
               </span>
             </div>
             <h4 className="font-medium text-sm text-foreground line-clamp-2 mb-1">
               {announcement.title}
             </h4>
-            <p className="text-xs text-muted-foreground line-clamp-2">
-              {announcement.summary}
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p className="text-xs text-muted-foreground">
               By: {announcement.author}
             </p>
           </div>
@@ -154,14 +152,34 @@ export default function DashboardPage() {
     return null
   }
 
+  const userName = profile?.full_name || 'Student'
+
   return (
     <div className="min-h-screen bg-background pb-20">
-      <DashboardHeader notificationCount={notificationCount} />
+      {/* Custom Home Header */}
+      <header className="bg-background border-b border-border sticky top-0 z-40 lg:hidden">
+        <div className="flex items-center justify-between px-4 h-16 max-w-lg mx-auto">
+          <div>
+            <p className="text-sm text-muted-foreground">Hello,</p>
+            <h1 className="text-lg font-semibold text-foreground">{userName}</h1>
+          </div>
+          <Link href="/notifications">
+            <button className="relative p-2 rounded-full hover:bg-muted transition-colors">
+              <Bell className="w-6 h-6 text-foreground" />
+              {notificationCount > 0 && (
+                <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-medium text-white bg-destructive rounded-full px-1">
+                  {notificationCount > 99 ? '99+' : notificationCount}
+                </span>
+              )}
+            </button>
+          </Link>
+        </div>
+      </header>
 
       <main className="px-4 py-4 max-w-lg mx-auto">
         {/* Welcome Banner */}
         <div className="mb-5">
-          <WelcomeBanner userName={profile?.full_name || undefined} />
+          <WelcomeBanner userName={userName} />
         </div>
 
         {/* Quick Access Section */}

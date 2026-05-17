@@ -8,8 +8,6 @@ interface WelcomeBannerProps {
 }
 
 export function WelcomeBanner({ userName }: WelcomeBannerProps) {
-  const firstName = userName?.split(' ')[0] || 'Student'
-
   return (
     <Card className="overflow-hidden relative rounded-xl border-0 shadow-sm">
       {/* Background image */}
@@ -21,15 +19,18 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/85 to-primary/70" />
       </div>
       <CardContent className="p-5 relative z-10">
         <div className="space-y-1">
-          <h2 className="text-xl font-bold text-white">
-            Welcome Back, {firstName}!
+          <h2 className="text-lg font-bold text-white">
+            Welcome to
           </h2>
-          <p className="text-sm text-white/80">
-            Stay updated, stay connected.
+          <h3 className="text-xl font-bold text-white">
+            Njala Campus Connect
+          </h3>
+          <p className="text-sm text-white/90 mt-2">
+            Stay informed. Stay connected.
           </p>
         </div>
       </CardContent>
