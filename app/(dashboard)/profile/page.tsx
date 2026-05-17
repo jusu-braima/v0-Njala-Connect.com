@@ -1,13 +1,9 @@
 'use client'
 
-import { useState } from 'react'
 import { BottomNav } from '@/components/bottom-nav'
 import { ProfileAvatar } from '@/components/profile-avatar'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent } from '@/components/ui/card'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { 
@@ -17,62 +13,27 @@ import {
   Mail, 
   Phone, 
   GraduationCap,
-  ArrowLeft,
-  Edit2,
-  Loader2,
-  Check,
-  X
+  Loader2
 } from 'lucide-react'
 import Link from 'next/link'
-import { RoleBadge } from '@/components/role-badge'
-import { FileUpload } from '@/components/file-upload'
+import { cn } from '@/lib/utils'
 
 export default function ProfilePage() {
-  const { profile, isAuthenticated, isLoading, logout, updateProfile } = useAuth()
+  const { profile, isAuthenticated, isLoading, logout } = useAuth()
   const router = useRouter()
-  const [isEditing, setIsEditing] = useState(false)
-  const [isSaving, setIsSaving] = useState(false)
-  const [formData, setFormData] = useState({
-    full_name: '',
-    phone: '',
-    bio: '',
-    department: '',
-    student_id: '',
-  })
 
   const handleLogout = async () => {
     await logout()
-    router.push('/auth/login')
-  }
-
-  const startEditing = () => {
-    setFormData({
-      full_name: profile?.full_name || '',
-      phone: profile?.phone || '',
-      bio: profile?.bio || '',
-      department: profile?.department || '',
-      student_id: profile?.student_id || '',
-    })
-    setIsEditing(true)
-  }
-
-  const handleSave = async () => {
-    setIsSaving(true)
-    const success = await updateProfile(formData)
-    if (success) {
-      setIsEditing(false)
-    }
-    setIsSaving(false)
-  }
-
-  const handleAvatarUpload = async (pathname: string) => {
-    await updateProfile({ avatar_url: pathname })
+    router.push('/login')
   }
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground animate-pulse">Loading profile...</p>
+        </div>
       </div>
     )
   }
@@ -84,16 +45,16 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <header className="bg-primary">
+      <header className="bg-primary animate-fade-in-down">
         <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
           <Link href="/dashboard">
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
-              <ArrowLeft className="w-5 h-5" />
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 btn-press">
+              <ChevronRight className="w-5 h-5 rotate-180" />
             </Button>
           </Link>
           <h1 className="text-lg font-semibold text-white">Profile</h1>
           <Link href="/settings">
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 btn-press">
               <Settings className="w-5 h-5" />
             </Button>
           </Link>
@@ -102,215 +63,87 @@ export default function ProfilePage() {
 
       <main className="px-4 py-6 max-w-lg mx-auto">
         {/* Profile Card */}
-        <Card className="mb-6 border border-border">
+        <Card className="mb-6 border border-border card-hover animate-initial animate-fade-in-up">
           <CardContent className="p-6">
             <div className="flex flex-col items-center text-center">
-              <div className="relative">
+              {/* Avatar */}
+              <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-4 overflow-hidden animate-bounce-in ring-4 ring-primary/20">
                 <ProfileAvatar 
                   name={profile.full_name || undefined} 
                   image={profile.avatar_url ? `/api/file?pathname=${encodeURIComponent(profile.avatar_url)}` : undefined} 
                   size="xl" 
                 />
-                {!isEditing && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full bg-background"
-                    onClick={() => document.getElementById('avatar-upload')?.click()}
-                  >
-                    <Edit2 className="h-3.5 w-3.5" />
-                  </Button>
-                )}
               </div>
               
-              {/* Hidden avatar upload */}
-              <div className="hidden">
-                <div id="avatar-upload">
-                  <FileUpload
-                    folder="avatars"
-                    accept="image/*"
-                    maxSize={5}
-                    onUploadComplete={handleAvatarUpload}
-                    preview={false}
-                  />
-                </div>
-              </div>
-
-              <h2 className="mt-4 text-xl font-bold text-foreground">
+              {/* Name */}
+              <h2 className="text-xl font-bold text-foreground animate-initial animate-fade-in-up animate-delay-100">
                 {profile.full_name || 'No name set'}
               </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {profile.student_id || profile.email}
+              
+              {/* Student ID */}
+              <p className="text-sm text-muted-foreground mt-1 animate-initial animate-fade-in-up animate-delay-200">
+                {profile.student_id || 'No Student ID'}
               </p>
-              <p className="text-sm text-muted-foreground">
+              
+              {/* Department */}
+              <p className="text-sm text-muted-foreground animate-initial animate-fade-in-up animate-delay-300">
                 {profile.department || 'No department'}
               </p>
-              <div className="mt-2">
-                <RoleBadge role={profile.role} size="sm" />
-              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Edit Form or View Mode */}
-        {isEditing ? (
-          <Card className="mb-6 border border-border">
-            <CardHeader>
-              <CardTitle className="text-lg">Edit Profile</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="full_name">Full Name</Label>
-                <Input
-                  id="full_name"
-                  value={formData.full_name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, full_name: e.target.value }))}
-                  placeholder="Your full name"
-                />
+        {/* Contact Info */}
+        <Card className="mb-6 border border-border animate-initial animate-fade-in-up animate-delay-400">
+          <CardContent className="p-4 space-y-1">
+            {/* Email */}
+            <div className="flex items-center justify-between py-3 hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-all duration-300 cursor-pointer group">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-primary/20">
+                  <Mail className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-sm text-foreground">{profile.email}</span>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="student_id">Student ID</Label>
-                <Input
-                  id="student_id"
-                  value={formData.student_id}
-                  onChange={(e) => setFormData(prev => ({ ...prev, student_id: e.target.value }))}
-                  placeholder="NU2024001"
-                />
-              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="department">Department</Label>
-                <Input
-                  id="department"
-                  value={formData.department}
-                  onChange={(e) => setFormData(prev => ({ ...prev, department: e.target.value }))}
-                  placeholder="Computer Science"
-                />
+            {/* Phone */}
+            <div className="flex items-center justify-between py-3 hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-all duration-300 cursor-pointer group">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-primary/20">
+                  <Phone className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-sm text-foreground">{profile.phone || '+232 76 123456'}</span>
               </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  value={formData.phone}
-                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                  placeholder="+232 76 123456"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea
-                  id="bio"
-                  value={formData.bio}
-                  onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-                  placeholder="Tell us about yourself..."
-                  rows={3}
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <Button 
-                  onClick={handleSave} 
-                  disabled={isSaving}
-                  className="flex-1"
-                >
-                  {isSaving ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      <Check className="mr-2 h-4 w-4" />
-                      Save Changes
-                    </>
-                  )}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => setIsEditing(false)}
-                  disabled={isSaving}
-                >
-                  <X className="mr-2 h-4 w-4" />
-                  Cancel
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <>
-            {/* Contact Info */}
-            <Card className="mb-6 border border-border">
-              <CardContent className="p-4 space-y-1">
-                <button 
-                  className="w-full flex items-center justify-between py-3 hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-colors"
-                  onClick={startEditing}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Mail className="w-4 h-4 text-primary" />
-                    </div>
-                    <span className="text-sm text-foreground">{profile.email}</span>
+            {/* View Academic Profile */}
+            <Link href="/profile/academic">
+              <div className="flex items-center justify-between py-3 hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-all duration-300 cursor-pointer group">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:bg-primary/20">
+                    <GraduationCap className="w-4 h-4 text-primary" />
                   </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                </button>
-
-                <button 
-                  className="w-full flex items-center justify-between py-3 hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-colors"
-                  onClick={startEditing}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Phone className="w-4 h-4 text-primary" />
-                    </div>
-                    <span className="text-sm text-foreground">{profile.phone || 'Add phone number'}</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                </button>
-
-                <button 
-                  className="w-full flex items-center justify-between py-3 hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-colors"
-                  onClick={() => router.push('/profile/academic')}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                      <GraduationCap className="w-4 h-4 text-primary" />
-                    </div>
-                    <span className="text-sm text-foreground">View Academic Profile</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                </button>
-              </CardContent>
-            </Card>
-
-            {/* Edit Profile Button */}
-            <Button
-              variant="outline"
-              className="w-full h-12 font-medium mb-4"
-              onClick={startEditing}
-            >
-              <Edit2 className="mr-2 h-4 w-4" />
-              Edit Profile
-            </Button>
-          </>
-        )}
+                  <span className="text-sm text-foreground">View Academic Profile</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+              </div>
+            </Link>
+          </CardContent>
+        </Card>
 
         {/* Logout Button */}
-        <Button
-          variant="outline"
-          className="w-full h-12 text-destructive border-destructive/30 hover:bg-destructive/10 font-medium"
-          onClick={handleLogout}
-        >
-          <LogOut className="mr-2 h-4 w-4" />
-          Sign Out
-        </Button>
-
-        {/* App Version */}
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          NjalaConnect v1.0.0
-        </p>
+        <div className="animate-initial animate-fade-in-up animate-delay-500">
+          <Button
+            variant="outline"
+            className="w-full h-12 text-destructive border-destructive/30 hover:bg-destructive/10 font-medium btn-press transition-all duration-300 hover:scale-[1.02]"
+            onClick={handleLogout}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </Button>
+        </div>
       </main>
 
       <BottomNav />

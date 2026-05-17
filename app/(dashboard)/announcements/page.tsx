@@ -2,30 +2,39 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { BottomNav } from '@/components/bottom-nav'
-import { AnnouncementCard } from '@/components/announcement-card'
 import { EmptyState } from '@/components/empty-state'
-import { SkeletonList } from '@/components/skeleton-cards'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent } from '@/components/ui/card'
 import { useAuth } from '@/lib/auth-context'
 import { useRouter } from 'next/navigation'
 import { mockAnnouncements } from '@/lib/data'
 import { Filter, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
+import { formatDistanceToNow } from 'date-fns'
 
 const categories = [
   { id: 'all', label: 'All' },
-  { id: 'academic', label: 'Exams' },
+  { id: 'exams', label: 'Exams' },
   { id: 'general', label: 'General' },
-  { id: 'event', label: 'Events' },
-  { id: 'scholarship', label: 'Scholarships' },
+  { id: 'events', label: 'Events' },
+  { id: 'scholarships', label: 'Scholarships' },
 ]
+
+// Category badge colors matching the design
+const categoryColors: Record<string, string> = {
+  exams: 'bg-primary text-white',
+  registration: 'bg-blue-500 text-white',
+  events: 'bg-amber-500 text-white',
+  scholarships: 'bg-emerald-500 text-white',
+  general: 'bg-slate-500 text-white',
+}
 
 export default function AnnouncementsPage() {
   const { isAuthenticated } = useAuth()
   const router = useRouter()
   const [activeCategory, setActiveCategory] = useState<string>('all')
-  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -33,29 +42,10 @@ export default function AnnouncementsPage() {
     }
   }, [isAuthenticated, router])
 
-  // Simulate loading
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800)
-    return () => clearTimeout(timer)
-  }, [])
-
   const filteredAnnouncements = useMemo(() => {
     if (activeCategory === 'all') return mockAnnouncements
     return mockAnnouncements.filter(a => a.category === activeCategory)
   }, [activeCategory])
-
-  const handleBookmark = (id: string) => {
-    console.log('Bookmark:', id)
-  }
-
-  const handleShare = (id: string) => {
-    if (navigator.share) {
-      navigator.share({
-        title: 'Announcement',
-        url: `/announcements/${id}`,
-      })
-    }
-  }
 
   if (!isAuthenticated) {
     return null
@@ -64,15 +54,15 @@ export default function AnnouncementsPage() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-primary">
+      <header className="sticky top-0 z-40 bg-primary animate-fade-in-down">
         <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
           <Link href="/dashboard">
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 btn-press">
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
           <h1 className="text-lg font-semibold text-white">Announcements</h1>
-          <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+          <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 btn-press">
             <Filter className="w-5 h-5" />
           </Button>
         </div>
@@ -81,17 +71,18 @@ export default function AnnouncementsPage() {
       {/* Category Pills */}
       <div className="bg-background border-b border-border sticky top-14 z-30">
         <div className="px-4 py-3 max-w-lg mx-auto">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-            {categories.map((cat) => (
+          <div className="flex gap-2 overflow-x-auto no-scrollbar">
+            {categories.map((cat, index) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 className={cn(
-                  'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
+                  'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 btn-press animate-initial animate-fade-in-up',
                   activeCategory === cat.id
-                    ? 'bg-primary text-white'
+                    ? 'bg-primary text-white shadow-md shadow-primary/20 scale-105'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 )}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
                 {cat.label}
               </button>
@@ -101,25 +92,54 @@ export default function AnnouncementsPage() {
       </div>
 
       <main className="px-4 py-4 max-w-lg mx-auto">
-        {isLoading ? (
-          <SkeletonList variant="announcement" count={4} />
-        ) : filteredAnnouncements.length > 0 ? (
+        {filteredAnnouncements.length > 0 ? (
           <div className="space-y-3">
-            {filteredAnnouncements.map((announcement) => (
-              <AnnouncementCard
-                key={announcement.id}
-                announcement={announcement}
-                onBookmark={handleBookmark}
-                onShare={handleShare}
-              />
-            ))}
+            {filteredAnnouncements.map((announcement, index) => {
+              const categoryLabel = announcement.category.charAt(0).toUpperCase() + announcement.category.slice(1)
+              
+              return (
+                <Link key={announcement.id} href={`/announcements/${announcement.id}`}>
+                  <Card 
+                    className={cn(
+                      'card-hover cursor-pointer border border-border animate-initial animate-fade-in-up',
+                    )}
+                    style={{ animationDelay: `${index * 75}ms` }}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <Badge className={cn('text-[10px] font-medium rounded transition-transform hover:scale-105', categoryColors[announcement.category] || categoryColors.general)}>
+                          {categoryLabel.toUpperCase()}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
+                          {formatDistanceToNow(announcement.createdAt, { addSuffix: false })}
+                        </span>
+                      </div>
+                      
+                      <h3 className="font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                        {announcement.title}
+                      </h3>
+                      
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                        {announcement.excerpt || announcement.content}
+                      </p>
+                      
+                      <p className="text-xs text-muted-foreground">
+                        By: {announcement.author}
+                      </p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              )
+            })}
           </div>
         ) : (
-          <EmptyState
-            icon="megaphone"
-            title="No Announcements Found"
-            description="There are no announcements in this category yet."
-          />
+          <div className="animate-fade-in">
+            <EmptyState
+              icon="megaphone"
+              title="No Announcements Found"
+              description="There are no announcements in this category yet."
+            />
+          </div>
         )}
       </main>
 

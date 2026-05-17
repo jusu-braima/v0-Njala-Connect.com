@@ -1,10 +1,20 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Check if Supabase is configured
+const isSupabaseConfigured = () => {
+  return !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+}
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
   })
+
+  // If Supabase is not configured, skip auth checks (mock mode)
+  if (!isSupabaseConfigured()) {
+    return supabaseResponse
+  }
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -42,13 +52,13 @@ export async function updateSession(request: NextRequest) {
 
   if (isProtectedPath && !user) {
     const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
+    url.pathname = '/login'
     url.searchParams.set('redirect', request.nextUrl.pathname)
     return NextResponse.redirect(url)
   }
 
   // Redirect authenticated users away from auth pages
-  const authPaths = ['/auth/login', '/auth/sign-up']
+  const authPaths = ['/login', '/register']
   const isAuthPath = authPaths.some(path => request.nextUrl.pathname === path)
   
   if (isAuthPath && user) {
