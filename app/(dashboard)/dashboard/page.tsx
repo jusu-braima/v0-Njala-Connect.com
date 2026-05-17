@@ -135,7 +135,7 @@ function AnnouncementItem({ announcement }: { announcement: typeof mockAnnouncem
 }
 
 export default function DashboardPage() {
-  const { profile, isAuthenticated } = useAuth()
+  const { profile, isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
   const [notificationCount, setNotificationCount] = useState(8)
 
@@ -143,10 +143,18 @@ export default function DashboardPage() {
   const latestAnnouncements = mockAnnouncements.slice(0, 3)
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isLoading && !isAuthenticated) {
       router.push('/login')
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, isLoading, router])
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
 
   if (!isAuthenticated) {
     return null

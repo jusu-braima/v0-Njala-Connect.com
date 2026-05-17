@@ -85,6 +85,8 @@ const MOCK_USERS = {
   }
 }
 
+const MOCK_USER_STORAGE_KEY = 'njala_mock_user'
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -95,17 +97,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const supabase = createClient()
 
   const fetchProfile = useCallback(async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
-    
-    if (error) {
-      console.error('Error fetching profile:', error)
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      
+      if (error) {
+        console.error('Error fetching profile:', error)
+        return null
+      }
+      return data as Profile
+    } catch {
       return null
     }
-    return data as Profile
   }, [supabase])
 
   const refreshProfile = useCallback(async () => {
@@ -115,10 +121,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [user, fetchProfile])
 
+  // Restore mock user from storage on mount
   useEffect(() => {
-    // Get initial session
     const initializeAuth = async () => {
       try {
+        // First check for stored mock user
+        if (typeof window !== 'undefined') {
+          const storedMockUser = sessionStorage.getItem(MOCK_USER_STORAGE_KEY)
+          if (storedMockUser) {
+            const { user: mockUser, profile: mockProfile } = JSON.parse(storedMockUser)
+            setUser(mockUser)
+            setProfile(mockProfile)
+            setIsMockUser(true)
+            setIsLoading(false)
+            return
+          }
+        }
+
+        // Try Supabase session
         const { data: { session } } = await supabase.auth.getSession()
         setUser(session?.user ?? null)
         
@@ -138,6 +158,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // Don't override mock user state
+        if (isMockUser) return
+        
         setUser(session?.user ?? null)
         
         if (session?.user) {
@@ -154,10 +177,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       subscription.unsubscribe()
     }
-  }, [supabase, fetchProfile])
+  }, [supabase, fetchProfile, isMockUser])
 
   const logout = async () => {
     if (isMockUser) {
+      // Clear mock user from storage
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem(MOCK_USER_STORAGE_KEY)
+      }
       setUser(null)
       setProfile(null)
       setIsMockUser(false)
@@ -182,6 +209,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         aud: 'authenticated',
         created_at: mockUser.profile.created_at,
       } as SupabaseUser
+      
+      // Store mock user in sessionStorage
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem(MOCK_USER_STORAGE_KEY, JSON.stringify({
+          user: mockSupabaseUser,
+          profile: mockUser.profile
+        }))
+      }
       
       setUser(mockSupabaseUser)
       setProfile(mockUser.profile)
@@ -216,6 +251,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateProfile = async (data: Partial<Profile>): Promise<boolean> => {
     if (!user) return false
+
+    // For mock users, just update local state
+    if (isMockUser && profile) {
+      const updatedProfile = { ...profile, ...data }
+      setProfile(updatedProfile)
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem(MOCK_USER_STORAGE_KEY, JSON.stringify({
+          user,
+          profile: updatedProfile
+        }))
+      }
+      return true
+    }
 
     const { error } = await supabase
       .from('profiles')
