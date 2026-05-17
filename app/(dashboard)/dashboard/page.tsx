@@ -77,17 +77,24 @@ const quickActions: QuickAction[] = [
   },
 ]
 
-function QuickActionCard({ action }: { action: QuickAction }) {
+function QuickActionCard({ action, index }: { action: QuickAction; index: number }) {
   const Icon = action.icon
+  const delayClass = `animate-delay-${(index + 1) * 100}`
 
   return (
     <Link href={action.href}>
-      <Card className="h-full hover:shadow-md transition-all hover:scale-[1.02] cursor-pointer group border border-border">
+      <Card className={cn(
+        'h-full card-hover cursor-pointer group border border-border animate-initial animate-fade-in-up',
+        delayClass
+      )}>
         <CardContent className="p-4 flex flex-col items-center text-center">
-          <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center mb-2', action.color)}>
-            <Icon className={cn('w-6 h-6', action.iconColor)} />
+          <div className={cn(
+            'w-12 h-12 rounded-xl flex items-center justify-center mb-2 transition-all duration-300 group-hover:scale-110',
+            action.color
+          )}>
+            <Icon className={cn('w-6 h-6 transition-transform duration-300 group-hover:scale-110', action.iconColor)} />
           </div>
-          <h3 className="text-xs font-medium text-foreground">
+          <h3 className="text-xs font-medium text-foreground group-hover:text-primary transition-colors">
             {action.title}
           </h3>
         </CardContent>
@@ -105,12 +112,16 @@ const categoryColors: Record<string, string> = {
   general: 'bg-slate-500 text-white',
 }
 
-function AnnouncementItem({ announcement }: { announcement: typeof mockAnnouncements[0] }) {
+function AnnouncementItem({ announcement, index }: { announcement: typeof mockAnnouncements[0]; index: number }) {
   const categoryLabel = announcement.category.charAt(0).toUpperCase() + announcement.category.slice(1)
+  const delayClass = `animate-delay-${(index + 1) * 100}`
   
   return (
     <Link href={`/announcements/${announcement.id}`}>
-      <div className="py-3 border-b border-border last:border-0 hover:bg-muted/30 px-1 -mx-1 rounded transition-colors">
+      <div className={cn(
+        'py-3 border-b border-border last:border-0 hover:bg-muted/30 px-1 -mx-1 rounded transition-all duration-300 animate-initial animate-slide-in-right',
+        delayClass
+      )}>
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
@@ -121,7 +132,7 @@ function AnnouncementItem({ announcement }: { announcement: typeof mockAnnouncem
                 {formatDistanceToNow(announcement.createdAt, { addSuffix: false })}
               </span>
             </div>
-            <h4 className="font-medium text-sm text-foreground line-clamp-2 mb-1">
+            <h4 className="font-medium text-sm text-foreground line-clamp-2 mb-1 group-hover:text-primary transition-colors">
               {announcement.title}
             </h4>
             <p className="text-xs text-muted-foreground">
@@ -151,7 +162,10 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
+          <p className="text-sm text-muted-foreground animate-pulse">Loading...</p>
+        </div>
       </div>
     )
   }
@@ -165,17 +179,17 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Custom Home Header */}
-      <header className="bg-background border-b border-border sticky top-0 z-40 lg:hidden">
+      <header className="bg-background border-b border-border sticky top-0 z-40 lg:hidden animate-fade-in-down">
         <div className="flex items-center justify-between px-4 h-16 max-w-lg mx-auto">
           <div>
             <p className="text-sm text-muted-foreground">Hello,</p>
             <h1 className="text-lg font-semibold text-foreground">{userName}</h1>
           </div>
           <Link href="/notifications">
-            <button className="relative p-2 rounded-full hover:bg-muted transition-colors">
+            <button className="relative p-2 rounded-full hover:bg-muted transition-all duration-300 btn-press hover:scale-110">
               <Bell className="w-6 h-6 text-foreground" />
               {notificationCount > 0 && (
-                <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-medium text-white bg-destructive rounded-full px-1">
+                <span className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] flex items-center justify-center text-[10px] font-medium text-white bg-destructive rounded-full px-1 notification-pulse">
                   {notificationCount > 99 ? '99+' : notificationCount}
                 </span>
               )}
@@ -186,33 +200,33 @@ export default function DashboardPage() {
 
       <main className="px-4 py-4 max-w-lg mx-auto">
         {/* Welcome Banner */}
-        <div className="mb-5">
+        <div className="mb-5 animate-fade-in-up">
           <WelcomeBanner userName={userName} />
         </div>
 
         {/* Quick Access Section */}
         <div className="mb-5">
-          <h2 className="text-base font-semibold text-foreground mb-3">Quick Access</h2>
+          <h2 className="text-base font-semibold text-foreground mb-3 animate-initial animate-fade-in-up animate-delay-100">Quick Access</h2>
           <div className="grid grid-cols-3 gap-3">
-            {quickActions.map((action) => (
-              <QuickActionCard key={action.href} action={action} />
+            {quickActions.map((action, index) => (
+              <QuickActionCard key={action.href} action={action} index={index} />
             ))}
           </div>
         </div>
 
         {/* Latest Announcements Section */}
-        <div>
+        <div className="animate-initial animate-fade-in-up animate-delay-700">
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-base font-semibold text-foreground">Latest Announcement</h2>
-            <Link href="/announcements" className="text-sm text-primary font-medium flex items-center gap-1 hover:underline">
+            <Link href="/announcements" className="text-sm text-primary font-medium flex items-center gap-1 hover:underline group transition-colors">
               View all
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
-          <Card className="border border-border">
+          <Card className="border border-border card-hover">
             <CardContent className="p-3">
-              {latestAnnouncements.map((announcement) => (
-                <AnnouncementItem key={announcement.id} announcement={announcement} />
+              {latestAnnouncements.map((announcement, index) => (
+                <AnnouncementItem key={announcement.id} announcement={announcement} index={index} />
               ))}
             </CardContent>
           </Card>

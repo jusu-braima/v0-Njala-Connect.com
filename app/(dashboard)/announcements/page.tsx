@@ -54,15 +54,15 @@ export default function AnnouncementsPage() {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-primary">
+      <header className="sticky top-0 z-40 bg-primary animate-fade-in-down">
         <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
           <Link href="/dashboard">
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 btn-press">
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
           <h1 className="text-lg font-semibold text-white">Announcements</h1>
-          <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+          <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 btn-press">
             <Filter className="w-5 h-5" />
           </Button>
         </div>
@@ -71,17 +71,18 @@ export default function AnnouncementsPage() {
       {/* Category Pills */}
       <div className="bg-background border-b border-border sticky top-14 z-30">
         <div className="px-4 py-3 max-w-lg mx-auto">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
-            {categories.map((cat) => (
+          <div className="flex gap-2 overflow-x-auto no-scrollbar">
+            {categories.map((cat, index) => (
               <button
                 key={cat.id}
                 onClick={() => setActiveCategory(cat.id)}
                 className={cn(
-                  'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors',
+                  'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 btn-press animate-initial animate-fade-in-up',
                   activeCategory === cat.id
-                    ? 'bg-primary text-white'
+                    ? 'bg-primary text-white shadow-md shadow-primary/20 scale-105'
                     : 'bg-muted text-muted-foreground hover:bg-muted/80'
                 )}
+                style={{ animationDelay: `${index * 50}ms` }}
               >
                 {cat.label}
               </button>
@@ -93,15 +94,20 @@ export default function AnnouncementsPage() {
       <main className="px-4 py-4 max-w-lg mx-auto">
         {filteredAnnouncements.length > 0 ? (
           <div className="space-y-3">
-            {filteredAnnouncements.map((announcement) => {
+            {filteredAnnouncements.map((announcement, index) => {
               const categoryLabel = announcement.category.charAt(0).toUpperCase() + announcement.category.slice(1)
               
               return (
                 <Link key={announcement.id} href={`/announcements/${announcement.id}`}>
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer border border-border">
+                  <Card 
+                    className={cn(
+                      'card-hover cursor-pointer border border-border animate-initial animate-fade-in-up',
+                    )}
+                    style={{ animationDelay: `${index * 75}ms` }}
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <Badge className={cn('text-[10px] font-medium rounded', categoryColors[announcement.category] || categoryColors.general)}>
+                        <Badge className={cn('text-[10px] font-medium rounded transition-transform hover:scale-105', categoryColors[announcement.category] || categoryColors.general)}>
                           {categoryLabel.toUpperCase()}
                         </Badge>
                         <span className="text-xs text-muted-foreground whitespace-nowrap">
@@ -109,7 +115,7 @@ export default function AnnouncementsPage() {
                         </span>
                       </div>
                       
-                      <h3 className="font-semibold text-foreground mb-2 line-clamp-2">
+                      <h3 className="font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
                         {announcement.title}
                       </h3>
                       
@@ -127,11 +133,13 @@ export default function AnnouncementsPage() {
             })}
           </div>
         ) : (
-          <EmptyState
-            icon="megaphone"
-            title="No Announcements Found"
-            description="There are no announcements in this category yet."
-          />
+          <div className="animate-fade-in">
+            <EmptyState
+              icon="megaphone"
+              title="No Announcements Found"
+              description="There are no announcements in this category yet."
+            />
+          </div>
         )}
       </main>
 
