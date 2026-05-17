@@ -137,7 +137,7 @@ function AnnouncementItem({ announcement }: { announcement: typeof mockAnnouncem
 }
 
 export default function DashboardPage() {
-  const { user, isAuthenticated } = useAuth()
+  const { profile, isAuthenticated } = useAuth()
   const router = useRouter()
   const [notificationCount, setNotificationCount] = useState(8)
 
@@ -161,7 +161,7 @@ export default function DashboardPage() {
       <main className="px-4 py-4 max-w-lg mx-auto">
         {/* Welcome Banner */}
         <div className="mb-5">
-          <WelcomeBanner userName={user?.fullName} />
+          <WelcomeBanner userName={profile?.full_name || undefined} />
         </div>
 
         {/* Quick Access Section */}

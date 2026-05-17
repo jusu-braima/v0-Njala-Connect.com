@@ -15,7 +15,7 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
       {/* Background image */}
       <div className="absolute inset-0">
         <Image
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/njalauniversity_cover.jfif-9BsjPBYwC2Ag7E6d35Cb4Ev3L5VDr5.jpeg"
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/njalauniversity_cover.jfif-7RILqIIA2wqoQ9BP4qqeGpQqWcJFCp.jpeg"
           alt="Njala University Campus"
           fill
           className="object-cover"
@@ -26,7 +26,7 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
       <CardContent className="p-5 relative z-10">
         <div className="space-y-1">
           <h2 className="text-xl font-bold text-white">
-            Welcome Back!
+            Welcome Back, {firstName}!
           </h2>
           <p className="text-sm text-white/80">
             Stay updated, stay connected.
