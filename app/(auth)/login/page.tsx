@@ -266,34 +266,7 @@ export default function LoginPage() {
             </p>
           </motion.div>
 
-          {/* Test Credentials Info */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            className="mt-8 p-5 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50 backdrop-blur-sm shadow-xl shadow-black/5"
-          >
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary/20 to-emerald-500/20 flex items-center justify-center">
-                <Sparkles className="w-3.5 h-3.5 text-primary" />
-              </div>
-              <p className="text-xs font-bold text-foreground">Demo Credentials</p>
-            </div>
-            <div className="space-y-2 text-xs text-muted-foreground">
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-background/70 border border-border/30 hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer group">
-                <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Student</span>
-                <span className="font-mono text-[10px] bg-muted px-2 py-1 rounded-md">student@njala.edu.sl / student123</span>
-              </div>
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-background/70 border border-border/30 hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer group">
-                <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Staff</span>
-                <span className="font-mono text-[10px] bg-muted px-2 py-1 rounded-md">staff@njala.edu.sl / staff123</span>
-              </div>
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-background/70 border border-border/30 hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer group">
-                <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Admin</span>
-                <span className="font-mono text-[10px] bg-muted px-2 py-1 rounded-md">admin@njala.edu.sl / admin123</span>
-              </div>
-            </div>
-          </motion.div>
+
         </motion.div>
       </div>
     </div>
