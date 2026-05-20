@@ -18,10 +18,10 @@ import {
   EngagementFeedItem
 } from './types'
 
-export const faculties: Faculty[] = [
+export const schools: Faculty[] = [
   {
     id: 'agric-food-sciences',
-    name: 'Faculty of Agriculture and Food Sciences',
+    name: 'School of Agriculture and Food Sciences',
     departments: [
       { id: 'agric-extension', name: 'Agricultural Extension & Rural Sociology', facultyId: 'agric-food-sciences' },
       { id: 'agric-econ', name: 'Agricultural Economics', facultyId: 'agric-food-sciences' },
@@ -34,7 +34,7 @@ export const faculties: Faculty[] = [
   },
   {
     id: 'environmental-sciences',
-    name: 'Faculty of Environmental Sciences',
+    name: 'School of Environmental Sciences',
     departments: [
       { id: 'survey-geo', name: 'Survey and Geo Informatics', facultyId: 'environmental-sciences' },
       { id: 'land-management', name: 'Land Management and Administration', facultyId: 'environmental-sciences' },
@@ -43,7 +43,7 @@ export const faculties: Faculty[] = [
   },
   {
     id: 'natural-resources',
-    name: 'Faculty of Natural Resources Management',
+    name: 'School of Natural Resources Management',
     departments: [
       { id: 'forestry', name: 'Forestry', facultyId: 'natural-resources' },
       { id: 'horticulture', name: 'Horticulture', facultyId: 'natural-resources' },
@@ -54,7 +54,7 @@ export const faculties: Faculty[] = [
   },
   {
     id: 'technology',
-    name: 'Faculty of Technology',
+    name: 'School of Technology',
     departments: [
       { id: 'physics-cs', name: 'Physics & Computer Science', facultyId: 'technology' },
       { id: 'industrial-tech', name: 'Industrial Technology', facultyId: 'technology' },
@@ -64,7 +64,7 @@ export const faculties: Faculty[] = [
   },
   {
     id: 'basic-sciences',
-    name: 'Faculty of Basic Sciences',
+    name: 'School of Basic Sciences',
     departments: [
       { id: 'chemistry', name: 'Chemistry', facultyId: 'basic-sciences' },
       { id: 'biological-sciences', name: 'Biological Sciences', facultyId: 'basic-sciences' },
@@ -72,7 +72,7 @@ export const faculties: Faculty[] = [
   },
   {
     id: 'veterinary-medicine',
-    name: 'Faculty of Veterinary Medicine and Animal Sciences',
+    name: 'School of Veterinary Medicine and Animal Sciences',
     departments: [
       { id: 'vet-medicine', name: 'Veterinary Medicine', facultyId: 'veterinary-medicine' },
       { id: 'animal-sciences', name: 'Animal Sciences', facultyId: 'veterinary-medicine' },
@@ -80,7 +80,7 @@ export const faculties: Faculty[] = [
   },
   {
     id: 'postgraduate',
-    name: 'Faculty of Postgraduate Studies',
+    name: 'School of Postgraduate Studies',
     departments: [
       { id: 'postgrad-studies', name: 'Postgraduate Studies', facultyId: 'postgraduate' },
     ],
@@ -96,6 +96,9 @@ export const faculties: Faculty[] = [
     ],
   },
 ]
+
+// Keep backwards compatibility
+export const faculties = schools
 
 export const yearOfStudyOptions = [
   { value: '1', label: 'Year 1' },

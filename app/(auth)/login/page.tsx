@@ -9,7 +9,7 @@ import { Logo } from '@/components/logo'
 import { LoadingSpinner } from '@/components/loading-spinner'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Eye, EyeOff, ArrowLeft, Mail, Lock, Sparkles } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, Mail, Lock, Sparkles, ShieldCheck } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 import { motion } from 'framer-motion'
 
@@ -46,18 +46,23 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col bg-background relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute inset-0 gradient-mesh opacity-50" />
+      <div className="absolute inset-0 gradient-mesh opacity-40" />
       
       {/* Floating decorative elements */}
       <motion.div
-        animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-20 right-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl"
+        animate={{ y: [0, -25, 0], rotate: [0, 8, 0], scale: [1, 1.1, 1] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-24 right-8 w-36 h-36 bg-primary/10 rounded-full blur-3xl"
       />
       <motion.div
-        animate={{ y: [0, 20, 0], rotate: [0, -5, 0] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute bottom-40 left-10 w-40 h-40 bg-emerald-500/5 rounded-full blur-3xl"
+        animate={{ y: [0, 30, 0], rotate: [0, -6, 0], scale: [1, 1.15, 1] }}
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="absolute bottom-32 left-8 w-44 h-44 bg-emerald-500/10 rounded-full blur-3xl"
+      />
+      <motion.div
+        animate={{ y: [0, -15, 0], x: [0, 10, 0] }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute top-1/2 right-4 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl"
       />
 
       {/* Header */}
@@ -67,7 +72,7 @@ export default function LoginPage() {
         className="flex items-center p-4 border-b border-border/50 bg-background/80 backdrop-blur-xl relative z-10"
       >
         <Link href="/">
-          <Button variant="ghost" size="icon" className="text-foreground btn-press rounded-xl">
+          <Button variant="ghost" size="icon" className="text-foreground btn-press rounded-xl hover:bg-muted/80 hover:shadow-md transition-all duration-300">
             <ArrowLeft className="w-5 h-5" />
             <span className="sr-only">Go back</span>
           </Button>
@@ -85,83 +90,94 @@ export default function LoginPage() {
           className="flex justify-center mb-8"
         >
           <div className="relative">
-            <div className="absolute inset-0 bg-primary/10 rounded-full blur-2xl scale-150 animate-pulse-soft" />
+            <div className="absolute inset-0 bg-primary/15 rounded-full blur-2xl scale-150 animate-pulse-soft" />
             <Logo size="lg" variant="dark" />
           </div>
         </motion.div>
 
-        {/* Form */}
-        <div className="space-y-6 max-w-sm mx-auto w-full">
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-center space-y-2"
-          >
-            <div className="flex items-center justify-center gap-2 mb-1">
+        {/* Form Card */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
+          className="space-y-6 max-w-sm mx-auto w-full"
+        >
+          {/* Welcome Header */}
+          <div className="text-center space-y-2">
+            <motion.div 
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.3, type: "spring" }}
+              className="flex items-center justify-center gap-2 mb-1"
+            >
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-xs font-medium text-primary tracking-wider uppercase">Secure Login</span>
+              <span className="text-xs font-semibold text-primary tracking-wider uppercase">Secure Login</span>
               <Sparkles className="w-4 h-4 text-primary" />
-            </div>
+            </motion.div>
             <h2 className="text-2xl font-bold text-foreground font-display">Welcome Back</h2>
             <p className="text-sm text-muted-foreground">Sign in to continue to NjalaConnect</p>
-          </motion.div>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="p-4 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium"
+                initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                className="p-4 rounded-xl bg-destructive/10 border border-destructive/30 text-destructive text-sm font-medium flex items-center gap-3 shadow-lg shadow-destructive/5"
               >
+                <div className="w-8 h-8 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
                 {error}
               </motion.div>
             )}
 
+            {/* Email Input */}
             <motion.div 
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.4 }}
               className="space-y-2"
             >
               <Label htmlFor="email" className="text-foreground font-medium">Student ID or Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-300" />
                 <Input
                   id="email"
                   type="text"
                   placeholder="e.g., NU2024001 or email@njala.edu.sl"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="h-13 pl-11 rounded-xl bg-background border-input hover:border-primary/50 focus:border-primary transition-all duration-300 focus:shadow-lg focus:shadow-primary/5"
+                  className="h-13 pl-11 rounded-xl bg-background border-input hover:border-primary/50 focus:border-primary transition-all duration-300 focus:shadow-lg focus:shadow-primary/10 hover:shadow-md"
                   disabled={isLoading}
                 />
               </div>
             </motion.div>
 
+            {/* Password Input */}
             <motion.div 
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.5 }}
               className="space-y-2"
             >
               <Label htmlFor="password" className="text-foreground font-medium">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors duration-300" />
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="h-13 pl-11 pr-12 rounded-xl bg-background border-input hover:border-primary/50 focus:border-primary transition-all duration-300 focus:shadow-lg focus:shadow-primary/5"
+                  className="h-13 pl-11 pr-12 rounded-xl bg-background border-input hover:border-primary/50 focus:border-primary transition-all duration-300 focus:shadow-lg focus:shadow-primary/10 hover:shadow-md"
                   disabled={isLoading}
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 btn-press rounded-xl hover:bg-muted"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 btn-press rounded-xl hover:bg-muted transition-all duration-200"
                   onClick={() => setShowPassword(!showPassword)}
                   disabled={isLoading}
                 >
@@ -177,10 +193,11 @@ export default function LoginPage() {
               </div>
             </motion.div>
 
+            {/* Remember & Forgot */}
             <motion.div 
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.6 }}
               className="flex items-center justify-between"
             >
               <div className="flex items-center gap-2">
@@ -189,29 +206,31 @@ export default function LoginPage() {
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(checked as boolean)}
                   disabled={isLoading}
-                  className="border-primary data-[state=checked]:bg-primary rounded-md transition-all duration-200"
+                  className="border-primary/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary rounded-md transition-all duration-200 hover:border-primary"
                 />
-                <Label htmlFor="remember" className="text-sm font-normal cursor-pointer text-foreground">
+                <Label htmlFor="remember" className="text-sm font-normal cursor-pointer text-foreground hover:text-primary transition-colors">
                   Remember me
                 </Label>
               </div>
               <Link
                 href="/forgot-password"
-                className="text-sm text-primary hover:underline font-medium transition-colors hover:text-primary/80"
+                className="text-sm text-primary hover:underline font-medium transition-all hover:text-primary/80"
               >
                 Forgot password?
               </Link>
             </motion.div>
 
+            {/* Submit Button */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
+              transition={{ delay: 0.7 }}
+              className="pt-2"
             >
               <Button
                 type="submit"
                 size="lg"
-                className="w-full h-14 text-base font-bold rounded-xl bg-primary hover:bg-primary/90 btn-press transition-all duration-300 hover:shadow-xl hover:shadow-primary/20 group"
+                className="w-full h-14 text-base font-bold rounded-xl bg-gradient-to-r from-primary to-emerald-500 hover:from-primary/90 hover:to-emerald-500/90 btn-press transition-all duration-300 hover:shadow-xl hover:shadow-primary/25 active:scale-[0.98] group"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -220,8 +239,8 @@ export default function LoginPage() {
                   <>
                     Login
                     <motion.span
-                      className="ml-2"
-                      animate={{ x: [0, 4, 0] }}
+                      className="ml-2 inline-block"
+                      animate={{ x: [0, 5, 0] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
                     >
                       →
@@ -232,10 +251,11 @@ export default function LoginPage() {
             </motion.div>
           </form>
 
+          {/* Sign Up Link */}
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 0.8 }}
             className="text-center"
           >
             <p className="text-muted-foreground text-sm">
@@ -250,31 +270,31 @@ export default function LoginPage() {
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="mt-8 p-5 rounded-2xl bg-muted/30 border border-border/50 backdrop-blur-sm"
+            transition={{ delay: 0.9 }}
+            className="mt-8 p-5 rounded-2xl bg-gradient-to-br from-muted/50 to-muted/30 border border-border/50 backdrop-blur-sm shadow-xl shadow-black/5"
           >
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center">
-                <Sparkles className="w-3 h-3 text-primary" />
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary/20 to-emerald-500/20 flex items-center justify-center">
+                <Sparkles className="w-3.5 h-3.5 text-primary" />
               </div>
-              <p className="text-xs font-bold text-foreground">Test Credentials</p>
+              <p className="text-xs font-bold text-foreground">Demo Credentials</p>
             </div>
             <div className="space-y-2 text-xs text-muted-foreground">
-              <div className="flex items-center justify-between p-2 rounded-lg bg-background/50">
-                <span className="font-semibold text-foreground">Student</span>
-                <span className="font-mono text-[10px]">student@njala.edu.sl / student123</span>
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-background/70 border border-border/30 hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer group">
+                <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Student</span>
+                <span className="font-mono text-[10px] bg-muted px-2 py-1 rounded-md">student@njala.edu.sl / student123</span>
               </div>
-              <div className="flex items-center justify-between p-2 rounded-lg bg-background/50">
-                <span className="font-semibold text-foreground">Staff</span>
-                <span className="font-mono text-[10px]">staff@njala.edu.sl / staff123</span>
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-background/70 border border-border/30 hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer group">
+                <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Staff</span>
+                <span className="font-mono text-[10px] bg-muted px-2 py-1 rounded-md">staff@njala.edu.sl / staff123</span>
               </div>
-              <div className="flex items-center justify-between p-2 rounded-lg bg-background/50">
-                <span className="font-semibold text-foreground">Admin</span>
-                <span className="font-mono text-[10px]">admin@njala.edu.sl / admin123</span>
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-background/70 border border-border/30 hover:border-primary/30 hover:shadow-md transition-all duration-300 cursor-pointer group">
+                <span className="font-semibold text-foreground group-hover:text-primary transition-colors">Admin</span>
+                <span className="font-mono text-[10px] bg-muted px-2 py-1 rounded-md">admin@njala.edu.sl / admin123</span>
               </div>
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       </div>
     </div>
   )
