@@ -4,14 +4,7 @@ import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { ArrowRight, Sparkles, Users, BookOpen, Calendar, Shield } from 'lucide-react'
-
-const features = [
-  { icon: BookOpen, label: 'Courses' },
-  { icon: Calendar, label: 'Events' },
-  { icon: Users, label: 'Community' },
-  { icon: Shield, label: 'Secure' },
-]
+import { ArrowRight, Sparkles } from 'lucide-react'
 
 export default function SplashPage() {
   return (
@@ -114,31 +107,7 @@ export default function SplashPage() {
             Connecting Students, Lecturers & Administration
           </motion.p>
 
-          {/* Features row */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.1, duration: 0.6 }}
-            className="flex items-center justify-center gap-6 mt-8"
-          >
-            {features.map((feature, index) => {
-              const Icon = feature.icon
-              return (
-                <motion.div
-                  key={feature.label}
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 1.2 + index * 0.1, type: "spring", stiffness: 200 }}
-                  className="flex flex-col items-center gap-1"
-                >
-                  <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-[10px] text-white/70 font-medium">{feature.label}</span>
-                </motion.div>
-              )
-            })}
-          </motion.div>
+
         </div>
       </div>
 
