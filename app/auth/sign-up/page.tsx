@@ -21,12 +21,12 @@ import {
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState, useMemo } from 'react'
-import { GraduationCap, Loader2, BookOpen, Building2 } from 'lucide-react'
+import { GraduationCap, Loader2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
-// Schools/Faculties at Njala Campus with their departments
-const schoolsAndDepartments = {
-  'School of Agriculture and Food Sciences': [
+// Faculties at Njala Campus with their departments
+const facultiesAndDepartments = {
+  'Faculty of Agriculture and Food Sciences': [
     'Agricultural Extension & Rural Sociology',
     'Agricultural Economics',
     'Crop Science',
@@ -35,33 +35,33 @@ const schoolsAndDepartments = {
     'Animal Science',
     'Home Economics & Community Development',
   ],
-  'School of Environmental Sciences': [
-    'Department of Survey and Geo Informatics',
-    'Department of Land Management and Administration',
-    'Institute of Environmental Management and Quality Control',
+  'Faculty of Environmental Sciences': [
+    'Survey and Geo Informatics',
+    'Land Management and Administration',
+    'Environmental Management and Quality Control',
   ],
-  'School of Natural Resources Management': [
-    'Department of Forestry',
-    'Department of Horticulture',
-    'Department of Fisheries and Aquaculture',
-    'Department of Wildlife Management and Conservation',
-    'Department of Wood Science',
+  'Faculty of Natural Resources Management': [
+    'Forestry',
+    'Horticulture',
+    'Fisheries and Aquaculture',
+    'Wildlife Management and Conservation',
+    'Wood Science',
   ],
-  'School of Technology': [
-    'Department of Physics & Computer Science',
-    'Department of Industrial Technology',
-    'Department of Agricultural and Biosystems Engineering',
-    'Department of Maths and Statistics',
+  'Faculty of Technology': [
+    'Physics & Computer Science',
+    'Industrial Technology',
+    'Agricultural and Biosystems Engineering',
+    'Maths and Statistics',
   ],
-  'School of Basic Sciences': [
-    'Department of Chemistry',
-    'Department of Biological Sciences',
+  'Faculty of Basic Sciences': [
+    'Chemistry',
+    'Biological Sciences',
   ],
-  'School of Veterinary Medicine and Animal Sciences': [
+  'Faculty of Veterinary Medicine and Animal Sciences': [
     'Veterinary Medicine',
     'Animal Sciences',
   ],
-  'School of Postgraduate Studies': [
+  'Faculty of Postgraduate Studies': [
     'Postgraduate Studies',
   ],
   'Other Academic/Research Units': [
@@ -72,7 +72,7 @@ const schoolsAndDepartments = {
   ],
 }
 
-const schools = Object.keys(schoolsAndDepartments)
+const faculties = Object.keys(facultiesAndDepartments)
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -81,18 +81,18 @@ export default function SignUpPage() {
     confirmPassword: '',
     fullName: '',
     studentId: '',
-    school: '',
+    faculty: '',
     department: '',
   })
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
-  // Get departments based on selected school
+  // Get departments based on selected faculty
   const availableDepartments = useMemo(() => {
-    if (!formData.school) return []
-    return schoolsAndDepartments[formData.school as keyof typeof schoolsAndDepartments] || []
-  }, [formData.school])
+    if (!formData.faculty) return []
+    return facultiesAndDepartments[formData.faculty as keyof typeof facultiesAndDepartments] || []
+  }, [formData.faculty])
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -123,7 +123,7 @@ export default function SignUpPage() {
           data: {
             full_name: formData.fullName,
             student_id: formData.studentId,
-            school: formData.school,
+            faculty: formData.faculty,
             department: formData.department,
             role: 'student',
           },
@@ -140,8 +140,8 @@ export default function SignUpPage() {
 
   const updateField = (field: string, value: string) => {
     setFormData(prev => {
-      // Reset department when school changes
-      if (field === 'school') {
+      // Reset department when faculty changes
+      if (field === 'faculty') {
         return { ...prev, [field]: value, department: '' }
       }
       return { ...prev, [field]: value }
@@ -221,50 +221,40 @@ export default function SignUpPage() {
                       />
                     </div>
 
-                    {/* School/Faculty Selection */}
+                    {/* Faculty Selection */}
                     <div className="grid gap-2">
-                      <Label htmlFor="school" className="flex items-center gap-2">
-                        <Building2 className="h-4 w-4 text-primary" />
-                        School/Faculty
+                      <Label htmlFor="faculty">
+                        Faculty
                       </Label>
                       <Select 
-                        value={formData.school} 
-                        onValueChange={(value) => updateField('school', value)}
+                        value={formData.faculty} 
+                        onValueChange={(value) => updateField('faculty', value)}
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select your school/faculty" />
+                        <SelectTrigger className="h-11">
+                          <SelectValue placeholder="Select your faculty" />
                         </SelectTrigger>
                         <SelectContent>
-                          {schools.map(school => (
-                            <SelectItem key={school} value={school}>
-                              {school}
+                          {faculties.map(faculty => (
+                            <SelectItem key={faculty} value={faculty}>
+                              {faculty}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
 
-                    {/* Department Selection - Only show after school is selected */}
-                    <motion.div 
-                      className="grid gap-2"
-                      initial={false}
-                      animate={{ 
-                        opacity: formData.school ? 1 : 0.5,
-                        height: 'auto'
-                      }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Label htmlFor="department" className="flex items-center gap-2">
-                        <BookOpen className="h-4 w-4 text-primary" />
+                    {/* Department Selection */}
+                    <div className="grid gap-2">
+                      <Label htmlFor="department">
                         Department
                       </Label>
                       <Select 
                         value={formData.department} 
                         onValueChange={(value) => updateField('department', value)}
-                        disabled={!formData.school}
+                        disabled={!formData.faculty}
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder={formData.school ? "Select your department" : "Select a school first"} />
+                        <SelectTrigger className={`h-11 ${formData.department ? 'border-primary ring-1 ring-primary/20' : ''}`}>
+                          <SelectValue placeholder={formData.faculty ? "Select your department" : "Select a faculty first"} />
                         </SelectTrigger>
                         <SelectContent>
                           {availableDepartments.map(dept => (
@@ -274,7 +264,7 @@ export default function SignUpPage() {
                           ))}
                         </SelectContent>
                       </Select>
-                    </motion.div>
+                    </div>
                     
                     <div className="grid gap-2">
                       <Label htmlFor="password">Password</Label>
