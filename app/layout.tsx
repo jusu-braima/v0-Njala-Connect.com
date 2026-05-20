@@ -1,12 +1,19 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Plus_Jakarta_Sans, Space_Grotesk } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Providers } from '@/components/providers'
 import './globals.css'
 
-const inter = Inter({ 
+const plusJakarta = Plus_Jakarta_Sans({ 
   subsets: ["latin"],
-  variable: '--font-inter'
+  variable: '--font-plus-jakarta',
+  weight: ['300', '400', '500', '600', '700', '800']
+})
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: '--font-space-grotesk',
+  weight: ['300', '400', '500', '600', '700']
 })
 
 export const metadata: Metadata = {
@@ -49,7 +56,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-background" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className={`${plusJakarta.variable} ${spaceGrotesk.variable} font-sans antialiased`}>
         <Providers>
           {children}
         </Providers>
