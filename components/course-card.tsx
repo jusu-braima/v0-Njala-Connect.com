@@ -15,7 +15,7 @@ interface CourseCardProps {
 export function CourseCard({ course, className }: CourseCardProps) {
   return (
     <Link href={`/courses/${course.id}`}>
-      <Card className={cn('overflow-hidden hover:shadow-md transition-shadow cursor-pointer group', className)}>
+      <Card className={cn('overflow-hidden hover:shadow-md transition-shadow cursor-pointer group gradient-fill-hover corner-accent', className)}>
         <CardContent className="p-4">
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
