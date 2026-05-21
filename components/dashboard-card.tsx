@@ -43,6 +43,7 @@ export function DashboardCard({
         <Card className={cn(
           'transition-all duration-300 cursor-pointer border overflow-hidden relative group',
           'hover:shadow-xl hover:shadow-primary/5',
+          'orbs-bg gradient-fill-hover',
           variantClasses[variant],
           className
         )}>

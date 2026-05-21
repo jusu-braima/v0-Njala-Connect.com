@@ -16,9 +16,9 @@ export function WelcomeBanner({ userName }: WelcomeBannerProps) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ type: "spring", stiffness: 200, damping: 20 }}
     >
-      <Card className="overflow-hidden relative rounded-2xl border-0 shadow-xl group">
+      <Card className="overflow-hidden relative rounded-2xl border-0 shadow-xl group neon-border">
         {/* Background image */}
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 orbs-bg">
           <Image
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/njalauniversity_cover.jfif-7RILqIIA2wqoQ9BP4qqeGpQqWcJFCp.jpeg"
             alt="Njala University Campus"

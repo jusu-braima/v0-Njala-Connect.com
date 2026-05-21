@@ -51,6 +51,7 @@ export function EventCard({
         >
           <Card className={cn(
             'overflow-hidden hover:shadow-2xl hover:shadow-primary/10 transition-all cursor-pointer group border-border/50',
+            'aurora-bg noise-overlay neon-border',
             className
           )}>
             <div className="relative h-48 bg-muted overflow-hidden">
@@ -147,6 +148,7 @@ export function EventCard({
         >
           <Card className={cn(
             'hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group border-border/50',
+            'gradient-fill-hover corner-accent',
             className
           )}>
             <CardContent className="p-3 flex items-center gap-3">
@@ -191,6 +193,7 @@ export function EventCard({
       >
         <Card className={cn(
           'hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group border-border/50',
+          'mesh-bg shine-hover',
           className
         )}>
           <CardContent className="p-4">

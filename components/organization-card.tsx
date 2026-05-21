@@ -41,6 +41,7 @@ export function OrganizationCard({
       <Link href={`/organizations/${organization.id}`}>
         <Card className={cn(
           'hover:shadow-md transition-all hover:scale-[1.01] cursor-pointer group',
+          'gradient-fill-hover corner-accent',
           className
         )}>
           <CardContent className="p-3 flex items-center gap-3">
@@ -74,6 +75,7 @@ export function OrganizationCard({
     <Link href={`/organizations/${organization.id}`}>
       <Card className={cn(
         'hover:shadow-md transition-all hover:scale-[1.01] cursor-pointer group h-full',
+        'orbs-bg shine-hover sparkle-container',
         className
       )}>
         <CardContent className="p-4 flex flex-col h-full">

@@ -55,6 +55,7 @@ export function EngagementFeedCard({ item, className }: EngagementFeedCardProps)
     <Link href={item.actionUrl}>
       <Card className={cn(
         'hover:shadow-md transition-all hover:scale-[1.01] cursor-pointer group',
+        'shine-hover gradient-fill-hover',
         className
       )}>
         <CardContent className="p-4">

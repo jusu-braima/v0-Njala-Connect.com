@@ -43,6 +43,7 @@ export function ComplaintCard({ complaint, className, showActions = true }: Comp
     <Link href={`/complaints/${complaint.id}`}>
       <Card className={cn(
         'hover:shadow-md transition-all hover:scale-[1.01] cursor-pointer group',
+        'gradient-fill-hover sparkle-container',
         className
       )}>
         <CardContent className="p-4">

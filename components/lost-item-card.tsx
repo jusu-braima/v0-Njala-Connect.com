@@ -45,6 +45,7 @@ export function LostItemCard({ item, className, showActions = true }: LostItemCa
   return (
     <Card className={cn(
       'hover:shadow-md transition-all hover:scale-[1.01] cursor-pointer group overflow-hidden',
+      'mesh-bg shine-hover corner-accent',
       className
     )}>
       {item.imageUrl && (

@@ -75,6 +75,7 @@ export function AnnouncementCard({
         >
           <Card className={cn(
             'overflow-hidden hover:shadow-lg hover:shadow-primary/5 transition-all cursor-pointer group border-border/50',
+            'gradient-fill-hover',
             isUrgent && 'border-l-4 border-l-rose-500',
             className
           )}>
@@ -119,6 +120,7 @@ export function AnnouncementCard({
       >
         <Card className={cn(
           'overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all cursor-pointer group border-border/50 relative',
+          'orbs-bg noise-overlay sparkle-container',
           isUrgent && 'border-l-4 border-l-rose-500',
           className
         )}>

@@ -35,8 +35,8 @@ export function StatsCard({
   className
 }: StatsCardProps) {
   return (
-    <Card className={cn('', className)}>
-      <CardContent className="p-4">
+    <Card className={cn('mesh-bg sparkle-container', className)}>
+      <CardContent className="p-4 relative z-10">
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <p className="text-sm font-medium text-muted-foreground mb-1">

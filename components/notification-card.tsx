@@ -63,6 +63,7 @@ export function NotificationCard({
     <Card 
       className={cn(
         'overflow-hidden transition-all cursor-pointer group',
+        'shine-hover gradient-fill-hover',
         !notification.read && 'bg-primary/5 border-primary/20',
         className
       )}
