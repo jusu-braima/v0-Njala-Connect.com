@@ -32,7 +32,9 @@ interface QuickAction {
   icon: LucideIcon
   href: string
   bgColor: string
+  iconBgColor: string
   iconColor: string
+  arrowBgColor: string
   arrowColor: string
 }
 
@@ -42,54 +44,66 @@ const quickActions: QuickAction[] = [
     description: 'Stay updated with the latest news and notices.',
     icon: Megaphone,
     href: '/announcements',
-    bgColor: 'bg-blue-100/60',
+    bgColor: 'bg-blue-50',
+    iconBgColor: 'bg-blue-100',
     iconColor: 'text-blue-600',
-    arrowColor: 'text-blue-500',
+    arrowBgColor: 'bg-blue-100',
+    arrowColor: 'text-blue-600',
   },
   {
     title: 'Course Updates',
     description: 'Check the latest updates and materials for your courses.',
     icon: BookOpen,
     href: '/courses',
-    bgColor: 'bg-violet-100/60',
+    bgColor: 'bg-violet-50',
+    iconBgColor: 'bg-violet-100',
     iconColor: 'text-violet-600',
-    arrowColor: 'text-violet-500',
+    arrowBgColor: 'bg-violet-100',
+    arrowColor: 'text-violet-600',
   },
   {
     title: 'Complaints',
     description: 'Raise an issue or track the status of your complaints.',
     icon: MessageSquareWarning,
     href: '/complaints',
-    bgColor: 'bg-rose-100/60',
+    bgColor: 'bg-rose-50',
+    iconBgColor: 'bg-rose-100',
     iconColor: 'text-rose-600',
-    arrowColor: 'text-rose-500',
+    arrowBgColor: 'bg-rose-100',
+    arrowColor: 'text-rose-600',
   },
   {
     title: 'Lost & Found',
     description: 'Report or find lost items on campus.',
     icon: SearchX,
     href: '/lost-found',
-    bgColor: 'bg-slate-100/60',
+    bgColor: 'bg-slate-50',
+    iconBgColor: 'bg-slate-100',
     iconColor: 'text-slate-600',
-    arrowColor: 'text-slate-500',
+    arrowBgColor: 'bg-slate-100',
+    arrowColor: 'text-slate-600',
   },
   {
     title: 'Events',
     description: 'Explore upcoming events and activities.',
     icon: CalendarDays,
     href: '/events',
-    bgColor: 'bg-amber-100/60',
+    bgColor: 'bg-amber-50',
+    iconBgColor: 'bg-amber-100',
     iconColor: 'text-amber-600',
-    arrowColor: 'text-amber-500',
+    arrowBgColor: 'bg-amber-100',
+    arrowColor: 'text-amber-600',
   },
   {
     title: 'Opportunities',
     description: 'Discover internships, jobs and other opportunities.',
     icon: Gift,
     href: '/opportunities',
-    bgColor: 'bg-emerald-100/60',
+    bgColor: 'bg-emerald-50',
+    iconBgColor: 'bg-emerald-100',
     iconColor: 'text-emerald-600',
-    arrowColor: 'text-emerald-500',
+    arrowBgColor: 'bg-emerald-100',
+    arrowColor: 'text-emerald-600',
   },
 ]
 
@@ -104,50 +118,50 @@ function QuickActionCard({ action, index }: { action: QuickAction; index: number
         delay: index * 0.08,
         duration: 0.5
       }}
-      whileHover={{ y: -8 }}
+      whileHover={{ y: -6 }}
       whileTap={{ scale: 0.98 }}
     >
       <Link href={action.href}>
         <Card className={cn(
-          'h-full cursor-pointer group border border-border/30 rounded-3xl overflow-hidden relative',
-          'transition-all duration-300 hover:shadow-lg hover:shadow-black/10',
+          'h-full cursor-pointer group border border-border/40 rounded-2xl overflow-hidden relative min-h-[220px]',
+          'transition-all duration-300 hover:shadow-xl hover:shadow-black/5',
           action.bgColor
         )}>
-          {/* Top section with icon */}
-          <div className="pt-6 px-5 pb-3">
-            <motion.div 
+          {/* Content */}
+          <div className="p-5 flex flex-col h-full">
+            {/* Icon circle */}
+            <div 
               className={cn(
-                'w-20 h-20 rounded-full flex items-center justify-center mb-3',
-                `bg-${action.bgColor.split('-')[1]}-200/80`,
+                'w-16 h-16 rounded-full flex items-center justify-center mb-4 shadow-sm',
+                action.iconBgColor
               )}
-              whileHover={{ scale: 1.05 }}
-              transition={{ duration: 0.2 }}
             >
-              <Icon className={cn('w-10 h-10', action.iconColor)} strokeWidth={1.5} />
-            </motion.div>
+              <Icon className={cn('w-8 h-8', action.iconColor)} strokeWidth={1.5} />
+            </div>
 
-            <h3 className="text-base font-bold text-foreground mb-1.5">
+            {/* Title */}
+            <h3 className="text-lg font-bold text-foreground mb-2">
               {action.title}
             </h3>
             
-            <p className="text-sm text-foreground/70 leading-relaxed">
+            {/* Description */}
+            <p className="text-sm text-muted-foreground leading-relaxed flex-1">
               {action.description}
             </p>
-          </div>
 
-          {/* Bottom section with arrow */}
-          <div className="px-5 pb-5 pt-3 flex items-end justify-between">
-            <div />
-            <motion.div 
-              className={cn(
-                'w-10 h-10 rounded-full flex items-center justify-center',
-                `bg-${action.bgColor.split('-')[1]}-200/80`,
-              )}
-              whileHover={{ scale: 1.1, x: 2 }}
-              transition={{ duration: 0.2 }}
-            >
-              <ChevronRight className={cn('w-5 h-5', action.arrowColor)} strokeWidth={2.5} />
-            </motion.div>
+            {/* Arrow button at bottom */}
+            <div className="mt-4 flex justify-start">
+              <motion.div 
+                className={cn(
+                  'w-10 h-10 rounded-full flex items-center justify-center shadow-sm',
+                  action.arrowBgColor
+                )}
+                whileHover={{ scale: 1.1, x: 3 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronRight className={cn('w-5 h-5', action.arrowColor)} strokeWidth={2.5} />
+              </motion.div>
+            </div>
           </div>
         </Card>
       </Link>
