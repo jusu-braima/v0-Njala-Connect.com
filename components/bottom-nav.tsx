@@ -25,7 +25,7 @@ export function BottomNav({ notificationCount = 0 }: BottomNavProps) {
       initial={{ y: 100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 260, damping: 20, delay: 0.2 }}
-      className="fixed bottom-0 left-0 right-0 z-50 lg:hidden"
+      className="fixed bottom-0 left-0 right-0 z-50 lg:hidden pb-[env(safe-area-inset-bottom)]"
     >
       {/* Glass background */}
       <div className="absolute inset-0 bg-background/80 backdrop-blur-xl border-t border-border/50" />
@@ -33,7 +33,7 @@ export function BottomNav({ notificationCount = 0 }: BottomNavProps) {
       {/* Gradient accent line */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
-      <div className="relative flex items-center justify-around h-18 max-w-lg mx-auto px-2">
+      <div className="relative flex items-center justify-around h-16 w-full px-2">
         {navItems.map((item, index) => {
           const isActive = pathname === item.href || 
             (item.href !== '/dashboard' && pathname.startsWith(item.href))
@@ -113,7 +113,7 @@ export function BottomNav({ notificationCount = 0 }: BottomNavProps) {
       </div>
       
       {/* Safe area padding */}
-      <div className="h-safe-area-inset-bottom bg-background/80 backdrop-blur-xl" />
+      <div className="safe-area-inset-bottom bg-background/80 backdrop-blur-xl" />
     </motion.nav>
   )
 }
