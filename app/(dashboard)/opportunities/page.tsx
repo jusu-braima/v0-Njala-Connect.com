@@ -73,10 +73,12 @@ export default function OpportunitiesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <DashboardHeader notificationCount={8} />
+    <div className="min-h-screen bg-background pb-20 lg:pb-8">
+      <div className="lg:hidden">
+        <DashboardHeader notificationCount={8} />
+      </div>
 
-      <main className="px-4 py-6 max-w-lg mx-auto">
+      <main className="px-4 py-6 max-w-lg mx-auto lg:max-w-5xl xl:max-w-6xl">
         {/* Page Header */}
         <div className="mb-6">
           <h1 className="text-xl font-bold text-foreground">Campus Opportunities</h1>
@@ -182,7 +184,7 @@ export default function OpportunitiesPage() {
                 : "No opportunities posted yet. Check back soon!"}
             />
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
               {filteredOpportunities.map((opportunity) => (
                 <OpportunityCard key={opportunity.id} opportunity={opportunity} />
               ))}
@@ -191,7 +193,9 @@ export default function OpportunitiesPage() {
         </section>
       </main>
 
-      <BottomNav notificationCount={8} />
+      <div className="lg:hidden">
+        <BottomNav notificationCount={8} />
+      </div>
     </div>
   )
 }

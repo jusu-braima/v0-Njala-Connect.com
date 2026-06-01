@@ -63,10 +63,12 @@ export default function OrganizationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <DashboardHeader notificationCount={8} />
+    <div className="min-h-screen bg-background pb-20 lg:pb-8">
+      <div className="lg:hidden">
+        <DashboardHeader notificationCount={8} />
+      </div>
 
-      <main className="px-4 py-6 max-w-lg mx-auto">
+      <main className="px-4 py-6 max-w-lg mx-auto lg:max-w-5xl xl:max-w-6xl">
         {/* Page Header */}
         <div className="mb-6">
           <h1 className="text-xl font-bold text-foreground">Student Organizations</h1>
@@ -147,7 +149,7 @@ export default function OrganizationsPage() {
                 : "No student organizations registered yet."}
             />
           ) : (
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
               {filteredOrganizations.map((organization) => (
                 <OrganizationCard key={organization.id} organization={organization} />
               ))}
@@ -156,7 +158,9 @@ export default function OrganizationsPage() {
         </section>
       </main>
 
-      <BottomNav notificationCount={8} />
+      <div className="lg:hidden">
+        <BottomNav notificationCount={8} />
+      </div>
     </div>
   )
 }

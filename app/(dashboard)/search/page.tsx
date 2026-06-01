@@ -114,7 +114,7 @@ export default function SearchPage() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-background/95 backdrop-blur border-b border-border">
-        <div className="flex items-center gap-2 px-4 h-14 max-w-2xl mx-auto">
+        <div className="flex items-center gap-2 px-4 h-14 max-w-2xl mx-auto lg:max-w-5xl">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
@@ -142,7 +142,7 @@ export default function SearchPage() {
         </div>
       </header>
 
-      <main className="px-4 py-4 max-w-2xl mx-auto">
+      <main className="px-4 py-4 max-w-2xl mx-auto lg:max-w-5xl">
         {!query && (
           <>
             {/* Recent Searches */}

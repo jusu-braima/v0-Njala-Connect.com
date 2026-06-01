@@ -263,8 +263,8 @@ export default function DashboardPage() {
   const userName = profile?.full_name || 'Student'
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Custom Home Header */}
+    <div className="min-h-screen bg-background pb-24 lg:pb-8">
+      {/* Custom Home Header - mobile only */}
       <motion.header 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -316,7 +316,7 @@ export default function DashboardPage() {
         </div>
       </motion.header>
 
-      <main className="px-4 py-5 max-w-lg mx-auto">
+      <main className="px-4 py-5 max-w-lg mx-auto lg:max-w-5xl xl:max-w-6xl">
         {/* Welcome Banner */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -375,7 +375,9 @@ export default function DashboardPage() {
         </motion.div>
       </main>
 
-      <BottomNav notificationCount={notificationCount} />
+      <div className="lg:hidden">
+        <BottomNav notificationCount={notificationCount} />
+      </div>
     </div>
   )
 }

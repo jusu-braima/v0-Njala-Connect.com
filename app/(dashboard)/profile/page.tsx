@@ -43,9 +43,9 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="bg-primary animate-fade-in-down">
+    <div className="min-h-screen bg-background pb-20 lg:pb-8">
+      {/* Header - mobile only */}
+      <header className="bg-primary animate-fade-in-down lg:hidden">
         <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
           <Link href="/dashboard">
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10 btn-press">
@@ -61,7 +61,7 @@ export default function ProfilePage() {
         </div>
       </header>
 
-      <main className="px-4 py-6 max-w-lg mx-auto">
+      <main className="px-4 py-6 max-w-lg mx-auto lg:max-w-2xl">
         {/* Profile Card */}
         <Card className="mb-6 border border-border card-hover animate-initial animate-fade-in-up">
           <CardContent className="p-6">
@@ -146,7 +146,9 @@ export default function ProfilePage() {
         </div>
       </main>
 
-      <BottomNav />
+      <div className="lg:hidden">
+        <BottomNav />
+      </div>
     </div>
   )
 }

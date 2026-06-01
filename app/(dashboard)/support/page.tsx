@@ -142,10 +142,12 @@ export default function SupportPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      <DashboardHeader notificationCount={8} />
+    <div className="min-h-screen bg-background pb-20 lg:pb-8">
+      <div className="lg:hidden">
+        <DashboardHeader notificationCount={8} />
+      </div>
 
-      <main className="px-4 py-6 max-w-lg mx-auto">
+      <main className="px-4 py-6 max-w-lg mx-auto lg:max-w-3xl">
         {/* Page Header */}
         <div className="mb-6">
           <h1 className="text-xl font-bold text-foreground">Support Center</h1>
@@ -153,7 +155,7 @@ export default function SupportPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <Link href="/complaints">
             <Card className="h-full hover:shadow-md transition-all hover:scale-[1.02] cursor-pointer group">
               <CardContent className="p-4">
@@ -240,7 +242,9 @@ export default function SupportPage() {
         </Card>
       </main>
 
-      <BottomNav notificationCount={8} />
+      <div className="lg:hidden">
+        <BottomNav notificationCount={8} />
+      </div>
     </div>
   )
 }

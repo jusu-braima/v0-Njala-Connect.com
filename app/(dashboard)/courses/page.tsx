@@ -36,9 +36,9 @@ export default function CoursesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+    <div className="min-h-screen bg-background pb-20 lg:pb-8">
+      {/* Header - mobile only */}
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border lg:hidden">
         <div className="flex items-center gap-3 px-4 h-14 max-w-lg mx-auto">
           <Button variant="ghost" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="w-5 h-5" />
@@ -55,7 +55,7 @@ export default function CoursesPage() {
         </div>
       </header>
 
-      <main className="px-4 py-4 max-w-lg mx-auto">
+      <main className="px-4 py-4 max-w-lg mx-auto lg:max-w-5xl xl:max-w-6xl">
         <div className="mb-4">
           <p className="text-sm text-muted-foreground">
             {mockCourses.length} registered courses
@@ -65,7 +65,7 @@ export default function CoursesPage() {
         {isLoading ? (
           <SkeletonList variant="course" count={5} />
         ) : mockCourses.length > 0 ? (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
             {mockCourses.map((course) => (
               <CourseCard key={course.id} course={course} />
             ))}
@@ -79,7 +79,9 @@ export default function CoursesPage() {
         )}
       </main>
 
-      <BottomNav notificationCount={3} />
+      <div className="lg:hidden">
+        <BottomNav notificationCount={3} />
+      </div>
     </div>
   )
 }

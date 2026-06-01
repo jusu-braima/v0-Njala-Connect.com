@@ -38,9 +38,9 @@ export default function LostFoundPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-primary">
+    <div className="min-h-screen bg-background pb-20 lg:pb-8">
+      {/* Header - mobile only */}
+      <header className="sticky top-0 z-40 bg-primary lg:hidden">
         <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
           <Link href="/dashboard">
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
@@ -57,8 +57,8 @@ export default function LostFoundPage() {
       </header>
 
       {/* Toggle Tabs */}
-      <div className="bg-background border-b border-border sticky top-14 z-30">
-        <div className="px-4 py-3 max-w-lg mx-auto">
+      <div className="bg-background border-b border-border sticky top-0 z-30">
+        <div className="px-4 py-3 max-w-lg mx-auto lg:max-w-5xl xl:max-w-6xl">
           <div className="flex rounded-xl overflow-hidden bg-muted p-1">
             <button
               onClick={() => setActiveTab('lost')}
@@ -86,7 +86,7 @@ export default function LostFoundPage() {
         </div>
       </div>
 
-      <main className="px-4 py-4 max-w-lg mx-auto">
+      <main className="px-4 py-4 max-w-lg mx-auto lg:max-w-5xl xl:max-w-6xl">
         {/* Items List */}
         {items.length === 0 ? (
           <EmptyState
@@ -101,7 +101,7 @@ export default function LostFoundPage() {
             }}
           />
         ) : (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">
             {items.map((item) => (
               <Link key={item.id} href={`/lost-found/${item.id}`}>
                 <div className="flex gap-3 p-3 bg-card border border-border rounded-xl hover:shadow-md transition-shadow">
@@ -159,7 +159,9 @@ export default function LostFoundPage() {
         )}
       </main>
 
-      <BottomNav />
+      <div className="lg:hidden">
+        <BottomNav />
+      </div>
     </div>
   )
 }
