@@ -53,12 +53,12 @@ export default function AnnouncementsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
-      {/* Header */}
+    <div className="min-h-screen bg-background pb-24 lg:pb-8">
+      {/* Header - mobile only */}
       <motion.header 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="sticky top-0 z-40 bg-gradient-to-r from-primary to-emerald-600 shadow-lg shadow-primary/20"
+        className="sticky top-0 z-40 bg-gradient-to-r from-primary to-emerald-600 shadow-lg shadow-primary/20 lg:hidden"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-primary/95 to-emerald-600/95 backdrop-blur-md" />
         <div className="relative flex items-center justify-between px-4 h-16 max-w-lg mx-auto">
@@ -83,8 +83,8 @@ export default function AnnouncementsPage() {
       </motion.header>
 
       {/* Category Pills */}
-      <div className="bg-background/80 backdrop-blur-xl border-b border-border/50 sticky top-16 z-30">
-        <div className="px-4 py-3 max-w-lg mx-auto">
+      <div className="bg-background/80 backdrop-blur-xl border-b border-border/50 sticky top-0 lg:top-0 z-30">
+        <div className="px-4 py-3 max-w-lg mx-auto lg:max-w-5xl xl:max-w-6xl">
           <div className="flex gap-2 overflow-x-auto no-scrollbar">
             {categories.map((cat, index) => (
               <motion.button
@@ -108,7 +108,7 @@ export default function AnnouncementsPage() {
         </div>
       </div>
 
-      <main className="px-4 py-5 max-w-lg mx-auto">
+      <main className="px-4 py-5 max-w-lg mx-auto lg:max-w-5xl xl:max-w-6xl">
         <AnimatePresence mode="wait">
           {filteredAnnouncements.length > 0 ? (
             <motion.div 
@@ -116,7 +116,7 @@ export default function AnnouncementsPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="space-y-3"
+              className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3"
             >
               {filteredAnnouncements.map((announcement, index) => {
                 const categoryLabel = announcement.category.charAt(0).toUpperCase() + announcement.category.slice(1)
@@ -177,7 +177,9 @@ export default function AnnouncementsPage() {
         </AnimatePresence>
       </main>
 
-      <BottomNav />
+      <div className="lg:hidden">
+        <BottomNav />
+      </div>
     </div>
   )
 }

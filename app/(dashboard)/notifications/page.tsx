@@ -66,9 +66,9 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
+    <div className="min-h-screen bg-background pb-20 lg:pb-8">
+      {/* Header - mobile only */}
+      <header className="sticky top-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border lg:hidden">
         <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
           <div className="flex items-center gap-2">
             <Bell className="w-5 h-5 text-primary" />
@@ -90,7 +90,7 @@ export default function NotificationsPage() {
         </div>
 
         {/* Filter Tabs */}
-        <div className="px-4 pb-3 max-w-lg mx-auto">
+        <div className="px-4 pb-3 max-w-lg mx-auto lg:max-w-5xl xl:max-w-6xl">
           <CategoryTabs
             categories={notificationTypes}
             activeCategory={activeFilter}
@@ -99,11 +99,11 @@ export default function NotificationsPage() {
         </div>
       </header>
 
-      <main className="px-4 py-4 max-w-lg mx-auto">
+      <main className="px-4 py-4 max-w-lg mx-auto lg:max-w-5xl xl:max-w-6xl">
         {isLoading ? (
           <SkeletonList variant="notification" count={4} />
         ) : filteredNotifications.length > 0 ? (
-          <div className="space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {filteredNotifications.map((notification) => (
               <NotificationCard
                 key={notification.id}
@@ -140,7 +140,9 @@ export default function NotificationsPage() {
         )}
       </main>
 
-      <BottomNav notificationCount={unreadCount} />
+      <div className="lg:hidden">
+        <BottomNav notificationCount={unreadCount} />
+      </div>
     </div>
   )
 }

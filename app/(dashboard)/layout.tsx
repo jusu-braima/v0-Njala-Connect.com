@@ -20,7 +20,7 @@ export default function DashboardLayout({
       <DesktopSidebar notificationCount={8} />
       
       {/* Main Content */}
-      <div className="flex-1 lg:ml-64 relative z-10">
+      <div className="flex-1 lg:ml-72 relative z-10 min-w-0">
         {children}
       </div>
     </div>

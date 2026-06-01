@@ -47,9 +47,9 @@ export default function ComplaintsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-primary">
+    <div className="min-h-screen bg-background pb-20 lg:pb-8">
+      {/* Header - mobile only */}
+      <header className="sticky top-0 z-40 bg-primary lg:hidden">
         <div className="flex items-center justify-between px-4 h-14 max-w-lg mx-auto">
           <Link href="/dashboard">
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
@@ -65,11 +65,11 @@ export default function ComplaintsPage() {
         </div>
       </header>
 
-      <main className="px-4 py-5 max-w-lg mx-auto">
+      <main className="px-4 py-5 max-w-lg mx-auto lg:max-w-5xl xl:max-w-6xl">
         {/* Category Selection Grid */}
         <div className="mb-6">
           <h2 className="text-base font-semibold text-foreground mb-3">Select Category</h2>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
             {complaintCategories.map((category) => {
               const Icon = categoryIcons[category.id]
               return (
@@ -119,7 +119,9 @@ export default function ComplaintsPage() {
         </div>
       </main>
 
-      <BottomNav />
+      <div className="lg:hidden">
+        <BottomNav />
+      </div>
     </div>
   )
 }
