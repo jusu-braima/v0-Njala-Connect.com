@@ -92,37 +92,43 @@ function QuickActionCard({ action, index }: { action: QuickAction; index: number
         stiffness: 200,
         damping: 20
       }}
-      whileHover={{ y: -4, scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={{ y: -6, scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
     >
       <Link href={action.href}>
-        <Card className="h-full cursor-pointer group border border-border/50 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 overflow-hidden relative">
-          {/* Gradient overlay on hover */}
-          <div className={cn(
-            "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-5 transition-opacity duration-300",
-            action.gradient
-          )} />
+        <Card className="h-full cursor-pointer group border-0 bg-gradient-to-br from-card via-card to-muted/30 hover:from-primary/5 hover:via-card hover:to-primary/10 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/15 overflow-hidden relative rounded-3xl">
+          {/* Animated gradient border */}
+          <div className="absolute inset-0 rounded-3xl p-[1px] bg-gradient-to-br from-border/50 via-transparent to-border/50 group-hover:from-primary/40 group-hover:via-primary/20 group-hover:to-primary/40 transition-all duration-500" />
+          
+          {/* Inner background */}
+          <div className="absolute inset-[1px] rounded-[calc(1.5rem-1px)] bg-card group-hover:bg-gradient-to-br group-hover:from-card group-hover:to-primary/5 transition-all duration-500" />
+          
+          {/* Shine sweep effect */}
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+            <div className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-12" />
+          </div>
           
           <CardContent className="p-4 flex flex-col items-center text-center relative z-10">
             <motion.div 
               className={cn(
-                'w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 relative overflow-hidden',
-                action.iconBg
+                'w-14 h-14 rounded-2xl flex items-center justify-center mb-3 transition-all duration-500 relative overflow-hidden border border-transparent group-hover:border-primary/20',
+                action.iconBg,
+                'group-hover:scale-110 group-hover:shadow-lg'
               )}
-              whileHover={{ rotate: [0, -10, 10, 0] }}
-              transition={{ duration: 0.5 }}
+              whileHover={{ rotate: [0, -5, 5, 0] }}
+              transition={{ duration: 0.4 }}
             >
-              {/* Icon glow effect */}
+              {/* Icon background glow */}
               <div className={cn(
-                "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-20 transition-opacity duration-300",
+                "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-40 transition-all duration-500 blur-sm",
                 action.gradient
               )} />
               <Icon className={cn(
                 'w-6 h-6 relative z-10 transition-all duration-300',
-                'text-foreground group-hover:scale-110'
+                'text-foreground group-hover:text-primary group-hover:drop-shadow-sm'
               )} strokeWidth={1.5} />
             </motion.div>
-            <h3 className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors tracking-tight">
+            <h3 className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors duration-300 tracking-tight">
               {action.title}
             </h3>
           </CardContent>
@@ -149,13 +155,17 @@ function AnnouncementItem({ announcement, index }: { announcement: typeof mockAn
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: 0.4 + index * 0.1 }}
+      whileHover={{ x: 4 }}
     >
       <Link href={`/announcements/${announcement.id}`}>
-        <div className='py-3.5 border-b border-border/50 last:border-0 hover:bg-muted/50 px-2 -mx-2 rounded-lg transition-all duration-300 group'>
+        <div className='py-3.5 border-b border-border/30 last:border-0 hover:bg-gradient-to-r hover:from-primary/5 hover:to-transparent px-3 -mx-3 rounded-xl transition-all duration-300 group relative overflow-hidden'>
+          {/* Hover indicator line */}
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-0 group-hover:h-8 bg-primary rounded-full transition-all duration-300" />
+          
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1.5">
-                <Badge className={cn('text-[10px] font-bold h-5 rounded-md px-2', categoryColors[announcement.category] || categoryColors.general)}>
+                <Badge className={cn('text-[10px] font-bold h-5 rounded-full px-2.5 shadow-sm', categoryColors[announcement.category] || categoryColors.general)}>
                   {categoryLabel.toUpperCase()}
                 </Badge>
                 <span className="text-xs text-muted-foreground flex items-center gap-1">
@@ -163,14 +173,19 @@ function AnnouncementItem({ announcement, index }: { announcement: typeof mockAn
                   {formatDistanceToNow(announcement.createdAt, { addSuffix: false })}
                 </span>
               </div>
-              <h4 className="font-semibold text-sm text-foreground line-clamp-2 mb-1 group-hover:text-primary transition-colors">
+              <h4 className="font-semibold text-sm text-foreground line-clamp-2 mb-1 group-hover:text-primary transition-colors duration-300">
                 {announcement.title}
               </h4>
               <p className="text-xs text-muted-foreground">
                 By: {announcement.author}
               </p>
             </div>
-            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-300 mt-1 flex-shrink-0" />
+            <motion.div
+              className="mt-1 flex-shrink-0"
+              whileHover={{ x: 2 }}
+            >
+              <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-all duration-300" />
+            </motion.div>
           </div>
         </div>
       </Link>
@@ -315,8 +330,12 @@ export default function DashboardPage() {
               <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
-          <Card className="border border-border/50 shadow-sm hover:shadow-md transition-shadow duration-300">
-            <CardContent className="p-4">
+          <Card className="border-0 bg-gradient-to-br from-card via-card to-muted/20 shadow-lg hover:shadow-xl transition-all duration-500 rounded-3xl relative overflow-hidden group">
+            {/* Subtle gradient border */}
+            <div className="absolute inset-0 rounded-3xl p-[1px] bg-gradient-to-br from-border/60 via-transparent to-border/60 group-hover:from-primary/30 group-hover:to-primary/30 transition-all duration-500" />
+            <div className="absolute inset-[1px] rounded-[calc(1.5rem-1px)] bg-card" />
+            
+            <CardContent className="p-4 relative z-10">
               {latestAnnouncements.map((announcement, index) => (
                 <AnnouncementItem key={announcement.id} announcement={announcement} index={index} />
               ))}
