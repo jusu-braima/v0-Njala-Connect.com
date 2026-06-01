@@ -31,10 +31,9 @@ interface QuickAction {
   description: string
   icon: LucideIcon
   href: string
-  gradient: string
-  iconBg: string
-  cardBg: string
-  decorativeIcon?: LucideIcon
+  bgColor: string
+  iconColor: string
+  arrowColor: string
 }
 
 const quickActions: QuickAction[] = [
@@ -43,180 +42,113 @@ const quickActions: QuickAction[] = [
     description: 'Stay updated with the latest news and notices.',
     icon: Megaphone,
     href: '/announcements',
-    gradient: 'from-blue-500 to-cyan-500',
-    iconBg: 'bg-blue-500/10',
-    cardBg: 'from-blue-50/40 to-cyan-50/40 hover:from-blue-100/50 hover:to-cyan-100/50',
-    decorativeIcon: Bell,
+    bgColor: 'bg-blue-100/60',
+    iconColor: 'text-blue-600',
+    arrowColor: 'text-blue-500',
   },
   {
     title: 'Course Updates',
     description: 'Check the latest updates and materials for your courses.',
     icon: BookOpen,
     href: '/courses',
-    gradient: 'from-violet-500 to-purple-500',
-    iconBg: 'bg-violet-500/10',
-    cardBg: 'from-violet-50/40 to-purple-50/40 hover:from-violet-100/50 hover:to-purple-100/50',
-    decorativeIcon: BookOpen,
+    bgColor: 'bg-violet-100/60',
+    iconColor: 'text-violet-600',
+    arrowColor: 'text-violet-500',
   },
   {
     title: 'Complaints',
     description: 'Raise an issue or track the status of your complaints.',
     icon: MessageSquareWarning,
     href: '/complaints',
-    gradient: 'from-rose-500 to-pink-500',
-    iconBg: 'bg-rose-500/10',
-    cardBg: 'from-rose-50/40 to-pink-50/40 hover:from-rose-100/50 hover:to-pink-100/50',
+    bgColor: 'bg-rose-100/60',
+    iconColor: 'text-rose-600',
+    arrowColor: 'text-rose-500',
   },
   {
     title: 'Lost & Found',
     description: 'Report or find lost items on campus.',
     icon: SearchX,
     href: '/lost-found',
-    gradient: 'from-slate-500 to-gray-500',
-    iconBg: 'bg-slate-500/10',
-    cardBg: 'from-slate-50/40 to-gray-50/40 hover:from-slate-100/50 hover:to-gray-100/50',
+    bgColor: 'bg-slate-100/60',
+    iconColor: 'text-slate-600',
+    arrowColor: 'text-slate-500',
   },
   {
     title: 'Events',
     description: 'Explore upcoming events and activities.',
     icon: CalendarDays,
     href: '/events',
-    gradient: 'from-amber-500 to-orange-500',
-    iconBg: 'bg-amber-500/10',
-    cardBg: 'from-amber-50/40 to-orange-50/40 hover:from-amber-100/50 hover:to-orange-100/50',
+    bgColor: 'bg-amber-100/60',
+    iconColor: 'text-amber-600',
+    arrowColor: 'text-amber-500',
   },
   {
     title: 'Opportunities',
     description: 'Discover internships, jobs and other opportunities.',
     icon: Gift,
     href: '/opportunities',
-    gradient: 'from-emerald-500 to-teal-500',
-    iconBg: 'bg-emerald-500/10',
-    cardBg: 'from-emerald-50/40 to-teal-50/40 hover:from-emerald-100/50 hover:to-teal-100/50',
+    bgColor: 'bg-emerald-100/60',
+    iconColor: 'text-emerald-600',
+    arrowColor: 'text-emerald-500',
   },
 ]
 
 function QuickActionCard({ action, index }: { action: QuickAction; index: number }) {
   const Icon = action.icon
-  const DecorIcon = action.decorativeIcon
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.9 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ 
         delay: index * 0.08,
-        type: "spring",
-        stiffness: 200,
-        damping: 20
+        duration: 0.5
       }}
-      whileHover={{ y: -8, scale: 1.02 }}
+      whileHover={{ y: -8 }}
       whileTap={{ scale: 0.98 }}
     >
       <Link href={action.href}>
         <Card className={cn(
-          "h-full cursor-pointer group border-0 bg-gradient-to-br rounded-3xl overflow-hidden relative",
-          "transition-all duration-500 hover:shadow-2xl hover:shadow-primary/15",
-          "flex flex-col",
-          action.cardBg
+          'h-full cursor-pointer group border border-border/30 rounded-3xl overflow-hidden relative',
+          'transition-all duration-300 hover:shadow-lg hover:shadow-black/10',
+          action.bgColor
         )}>
-          {/* Animated gradient border */}
-          <div className="absolute inset-0 rounded-3xl p-[1px] bg-gradient-to-br opacity-0 group-hover:opacity-100 transition-all duration-500" style={{
-            backgroundImage: `linear-gradient(to bottom right, rgba(${action.gradient === 'from-blue-500 to-cyan-500' ? '59, 130, 246, 0.4' : action.gradient === 'from-violet-500 to-purple-500' ? '139, 92, 246, 0.4' : action.gradient === 'from-rose-500 to-pink-500' ? '244, 63, 94, 0.4' : action.gradient === 'from-slate-500 to-gray-500' ? '100, 116, 139, 0.4' : action.gradient === 'from-amber-500 to-orange-500' ? '217, 119, 6, 0.4' : '16, 185, 129, 0.4'}), transparent)`
-          }} />
-          
-          <div className="absolute inset-[1px] rounded-[calc(1.5rem-1px)] bg-gradient-to-br from-white/40 to-white/10" />
-          
-          {/* Decorative background elements */}
-          <motion.div 
-            animate={{ 
-              scale: [1, 1.1, 1],
-              opacity: [0.3, 0.5, 0.3]
-            }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute -bottom-8 -right-8 w-32 h-32 rounded-full blur-3xl opacity-40"
-            style={{
-              background: `linear-gradient(135deg, ${action.gradient === 'from-blue-500 to-cyan-500' ? '#0ea5e9' : action.gradient === 'from-violet-500 to-purple-500' ? '#a78bfa' : action.gradient === 'from-rose-500 to-pink-500' ? '#fb7185' : action.gradient === 'from-slate-500 to-gray-500' ? '#cbd5e1' : action.gradient === 'from-amber-500 to-orange-500' ? '#fbbf24' : '#10b981'}, transparent)`
-            }}
-          />
-          
-          {/* Decorative icon in background */}
-          {DecorIcon && (
-            <motion.div
-              animate={{ 
-                y: [0, 20, 0],
-                rotate: [0, 10, 0],
-                opacity: [0.1, 0.2, 0.1]
-              }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className={cn(
-                "absolute -bottom-4 -right-4 w-24 h-24 transition-all duration-500",
-                `text-${action.gradient.split('-')[1]}-${action.gradient.includes('500') ? '500' : '400'}/30`
-              )}
-            >
-              <DecorIcon className="w-full h-full" strokeWidth={1} />
-            </motion.div>
-          )}
-          
-          <CardContent className="p-5 relative z-10 flex-1 flex flex-col justify-between">
-            <div>
-              <motion.div 
-                className={cn(
-                  'w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 relative overflow-hidden border border-transparent group-hover:border-current',
-                  action.iconBg,
-                  'group-hover:scale-110 group-hover:shadow-lg',
-                  action.gradient === 'from-blue-500 to-cyan-500' ? 'text-blue-600' : 
-                  action.gradient === 'from-violet-500 to-purple-500' ? 'text-violet-600' :
-                  action.gradient === 'from-rose-500 to-pink-500' ? 'text-rose-600' :
-                  action.gradient === 'from-slate-500 to-gray-500' ? 'text-slate-600' :
-                  action.gradient === 'from-amber-500 to-orange-500' ? 'text-amber-600' :
-                  'text-emerald-600'
-                )}
-                whileHover={{ rotate: [0, -5, 5, 0] }}
-                transition={{ duration: 0.4 }}
-              >
-                {/* Icon background glow */}
-                <div className={cn(
-                  "absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-40 transition-all duration-500 blur-sm",
-                  action.gradient
-                )} />
-                <Icon className="w-8 h-8 relative z-10 transition-all duration-300" strokeWidth={1.5} />
-              </motion.div>
-              
-              <h3 className="text-sm font-bold text-foreground group-hover:text-transparent group-hover:bg-clip-text transition-all duration-300 tracking-tight mb-2"
-                style={{
-                  backgroundImage: `linear-gradient(135deg, ${action.gradient === 'from-blue-500 to-cyan-500' ? '#0ea5e9' : action.gradient === 'from-violet-500 to-purple-500' ? '#a78bfa' : action.gradient === 'from-rose-500 to-pink-500' ? '#fb7185' : action.gradient === 'from-slate-500 to-gray-500' ? '#cbd5e1' : action.gradient === 'from-amber-500 to-orange-500' ? '#fbbf24' : '#10b981'}, transparent)`,
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text'
-                }}
-              >
-                {action.title}
-              </h3>
-              
-              <p className="text-xs text-muted-foreground line-clamp-2 group-hover:text-foreground/70 transition-colors duration-300">
-                {action.description}
-              </p>
-            </div>
-
-            {/* Action arrow button */}
+          {/* Top section with icon */}
+          <div className="pt-6 px-5 pb-3">
             <motion.div 
-              className="mt-4 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 group-hover:translate-x-1"
-              style={{
-                background: `linear-gradient(135deg, ${action.gradient === 'from-blue-500 to-cyan-500' ? '#dbeafe' : action.gradient === 'from-violet-500 to-purple-500' ? '#ede9fe' : action.gradient === 'from-rose-500 to-pink-500' ? '#ffe4e6' : action.gradient === 'from-slate-500 to-gray-500' ? '#f1f5f9' : action.gradient === 'from-amber-500 to-orange-500' ? '#fef3c7' : '#dcfce7'}, transparent)`
-              }}
-              whileHover={{ scale: 1.1 }}
+              className={cn(
+                'w-20 h-20 rounded-full flex items-center justify-center mb-3',
+                `bg-${action.bgColor.split('-')[1]}-200/80`,
+              )}
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.2 }}
             >
-              <ChevronRight className={cn(
-                'w-5 h-5 transition-all duration-300',
-                action.gradient === 'from-blue-500 to-cyan-500' ? 'text-blue-600' : 
-                action.gradient === 'from-violet-500 to-purple-500' ? 'text-violet-600' :
-                action.gradient === 'from-rose-500 to-pink-500' ? 'text-rose-600' :
-                action.gradient === 'from-slate-500 to-gray-500' ? 'text-slate-600' :
-                action.gradient === 'from-amber-500 to-orange-500' ? 'text-amber-600' :
-                'text-emerald-600'
-              )} />
+              <Icon className={cn('w-10 h-10', action.iconColor)} strokeWidth={1.5} />
             </motion.div>
-          </CardContent>
+
+            <h3 className="text-base font-bold text-foreground mb-1.5">
+              {action.title}
+            </h3>
+            
+            <p className="text-sm text-foreground/70 leading-relaxed">
+              {action.description}
+            </p>
+          </div>
+
+          {/* Bottom section with arrow */}
+          <div className="px-5 pb-5 pt-3 flex items-end justify-between">
+            <div />
+            <motion.div 
+              className={cn(
+                'w-10 h-10 rounded-full flex items-center justify-center',
+                `bg-${action.bgColor.split('-')[1]}-200/80`,
+              )}
+              whileHover={{ scale: 1.1, x: 2 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronRight className={cn('w-5 h-5', action.arrowColor)} strokeWidth={2.5} />
+            </motion.div>
+          </div>
         </Card>
       </Link>
     </motion.div>
