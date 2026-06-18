@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { DashboardHeader } from '@/components/dashboard-header'
 import { BottomNav } from '@/components/bottom-nav'
 import { Button } from '@/components/ui/button'
@@ -14,7 +14,7 @@ import { ArrowLeft, Loader2, Send, Shield, CheckCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
 
-export default function ClaimItemPage() {
+function ClaimItemForm() {
   const { isAuthenticated, user } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -208,5 +208,13 @@ export default function ClaimItemPage() {
 
       <BottomNav notificationCount={8} />
     </div>
+  )
+}
+
+export default function ClaimItemPage() {
+  return (
+    <Suspense fallback={null}>
+      <ClaimItemForm />
+    </Suspense>
   )
 }

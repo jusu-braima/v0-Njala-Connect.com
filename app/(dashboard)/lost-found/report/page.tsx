@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { DashboardHeader } from '@/components/dashboard-header'
 import { BottomNav } from '@/components/bottom-nav'
 import { ImageUpload } from '@/components/image-upload'
@@ -30,7 +30,7 @@ import { cn } from '@/lib/utils'
 
 const MAX_DESCRIPTION_LENGTH = 500
 
-export default function ReportItemPage() {
+function ReportItemForm() {
   const { isAuthenticated } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -309,5 +309,13 @@ export default function ReportItemPage() {
 
       <BottomNav notificationCount={8} />
     </div>
+  )
+}
+
+export default function ReportItemPage() {
+  return (
+    <Suspense fallback={null}>
+      <ReportItemForm />
+    </Suspense>
   )
 }
