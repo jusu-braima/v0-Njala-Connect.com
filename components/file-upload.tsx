@@ -39,41 +39,32 @@ export function FileUpload({
       return
     }
 
-    // Set preview for images
-    if (preview && file.type.startsWith('image/')) {
-      const reader = new FileReader()
-      reader.onload = (e) => setPreviewUrl(e.target?.result as string)
-      reader.readAsDataURL(file)
-    }
     setFileName(file.name)
-
-    // Upload file
     setIsUploading(true)
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('folder', folder)
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
+    // Frontend-only: read the file as a local data URL.
+    // The real upload will be handled by the external backend.
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = (e) => resolve(e.target?.result as string)
+        reader.onerror = () => reject(new Error('Failed to read file'))
+        reader.readAsDataURL(file)
       })
 
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || 'Upload failed')
+      if (preview && file.type.startsWith('image/')) {
+        setPreviewUrl(dataUrl)
       }
 
-      const { pathname } = await response.json()
-      onUploadComplete(pathname)
+      onUploadComplete(dataUrl)
     } catch (error) {
-      onUploadError?.(error instanceof Error ? error.message : 'Upload failed')
+      onUploadError?.(error instanceof Error ? error.message : 'Failed to read file')
       setPreviewUrl(null)
       setFileName(null)
     } finally {
       setIsUploading(false)
     }
-  }, [folder, maxSize, onUploadComplete, onUploadError, preview])
+  }, [maxSize, onUploadComplete, onUploadError, preview])
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault()

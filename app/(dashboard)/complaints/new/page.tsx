@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { BottomNav } from '@/components/bottom-nav'
 import { ImageUpload } from '@/components/image-upload'
 import { Button } from '@/components/ui/button'
@@ -25,7 +25,7 @@ import Link from 'next/link'
 
 const MAX_DESCRIPTION_LENGTH = 250
 
-export default function NewComplaintPage() {
+function NewComplaintForm() {
   const { isAuthenticated } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -196,5 +196,13 @@ export default function NewComplaintPage() {
 
       <BottomNav />
     </div>
+  )
+}
+
+export default function NewComplaintPage() {
+  return (
+    <Suspense fallback={null}>
+      <NewComplaintForm />
+    </Suspense>
   )
 }
