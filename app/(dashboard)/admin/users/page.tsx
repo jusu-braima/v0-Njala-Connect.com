@@ -1,7 +1,6 @@
 'use client'
 
-import { useState } from 'react'
-import useSWR from 'swr'
+import { useState, useMemo } from 'react'
 import { DashboardHeader } from '@/components/dashboard-header'
 import { BottomNav } from '@/components/bottom-nav'
 import { Button } from '@/components/ui/button'
@@ -45,8 +44,6 @@ import {
 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
-const fetcher = (url: string) => fetch(url).then(res => res.json())
-
 interface Profile {
   id: string
   email: string
@@ -58,48 +55,51 @@ interface Profile {
   created_at: string
 }
 
+// Mock users for the frontend-only demo. Replace with data from the
+// external backend once it is connected.
+const MOCK_USERS: Profile[] = [
+  { id: 'mock-student-id', email: 'student@njala.edu.sl', full_name: 'Emmanuel Koroma', student_id: '20/ENG/0123', department: 'Department of Computer Science', role: 'student', avatar_url: null, created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 'mock-staff-id', email: 'staff@njala.edu.sl', full_name: 'Jane Staff', student_id: null, department: 'Administration', role: 'staff', avatar_url: null, created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 'mock-admin-id', email: 'admin@njala.edu.sl', full_name: 'Admin User', student_id: null, department: 'IT Department', role: 'admin', avatar_url: null, created_at: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 'u-4', email: 'fatmata.kamara@njala.edu.sl', full_name: 'Fatmata Kamara', student_id: 'NJU/2022/0456', department: 'Maths and Statistics', role: 'student', avatar_url: null, created_at: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 'u-5', email: 'mohamed.sesay@njala.edu.sl', full_name: 'Mohamed Sesay', student_id: 'NJU/2021/0789', department: 'Crop Science', role: 'student', avatar_url: null, created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
+  { id: 'u-6', email: 'i.bangura@njala.edu.sl', full_name: 'Ibrahim Bangura', student_id: null, department: 'Library Services', role: 'staff', avatar_url: null, created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString() },
+]
+
 export default function AdminUsersPage() {
   const { profile, isAdmin } = useAuth()
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState<string>('all')
+  const [users, setUsers] = useState<Profile[]>(MOCK_USERS)
 
-  const queryParams = new URLSearchParams()
-  if (search) queryParams.set('search', search)
-  if (roleFilter !== 'all') queryParams.set('role', roleFilter)
+  const filteredUsers = useMemo(() => {
+    const term = search.trim().toLowerCase()
+    return users.filter((user) => {
+      const matchesRole = roleFilter === 'all' || user.role === roleFilter
+      const matchesSearch =
+        !term ||
+        user.full_name?.toLowerCase().includes(term) ||
+        user.email.toLowerCase().includes(term) ||
+        user.student_id?.toLowerCase().includes(term)
+      return matchesRole && matchesSearch
+    })
+  }, [users, search, roleFilter])
 
-  const { data, error, isLoading, mutate } = useSWR<{ users: Profile[], total: number }>(
-    `/api/users?${queryParams.toString()}`,
-    fetcher
-  )
+  const data = { users: filteredUsers, total: filteredUsers.length }
+  const isLoading = false
+  const error = null
 
-  const handleRoleChange = async (userId: string, newRole: string) => {
-    try {
-      const res = await fetch(`/api/users/${userId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: newRole }),
-      })
-      if (res.ok) {
-        mutate()
-      }
-    } catch (error) {
-      console.error('Failed to update role:', error)
-    }
+  const handleRoleChange = (userId: string, newRole: string) => {
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === userId ? { ...user, role: newRole as Profile['role'] } : user
+      )
+    )
   }
 
-  const handleDelete = async (userId: string) => {
+  const handleDelete = (userId: string) => {
     if (!confirm('Are you sure you want to delete this user?')) return
-    
-    try {
-      const res = await fetch(`/api/users/${userId}`, {
-        method: 'DELETE',
-      })
-      if (res.ok) {
-        mutate()
-      }
-    } catch (error) {
-      console.error('Failed to delete user:', error)
-    }
+    setUsers((prev) => prev.filter((user) => user.id !== userId))
   }
 
   const getRoleBadge = (role: string) => {

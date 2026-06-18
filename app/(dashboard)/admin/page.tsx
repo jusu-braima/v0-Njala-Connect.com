@@ -1,6 +1,5 @@
 'use client'
 
-import useSWR from 'swr'
 import { DashboardHeader } from '@/components/dashboard-header'
 import { BottomNav } from '@/components/bottom-nav'
 import { StatsCard, StatsGrid } from '@/components/stats-card'
@@ -28,8 +27,6 @@ import {
   Shield,
 } from 'lucide-react'
 
-const fetcher = (url: string) => fetch(url).then(res => res.json())
-
 interface AdminStats {
   users: {
     total: number
@@ -44,13 +41,34 @@ interface AdminStats {
   departments: Record<string, number>
 }
 
+// Mock stats for the frontend-only demo. Replace with data from the
+// external backend once it is connected.
+const MOCK_STATS: AdminStats = {
+  users: {
+    total: 1248,
+    students: 1180,
+    staff: 62,
+    admins: 6,
+    newThisWeek: 34,
+  },
+  announcements: {
+    total: 6,
+  },
+  departments: {
+    'Department of Computer Science': 210,
+    'Crop Science': 154,
+    'Maths and Statistics': 132,
+    'Animal Science': 98,
+    'Forestry': 76,
+    'Chemistry': 64,
+  },
+}
+
 export default function AdminDashboardPage() {
   const { isAuthenticated, isAdmin, isLoading: authLoading } = useAuth()
-  
-  const { data: stats, isLoading: statsLoading } = useSWR<AdminStats>(
-    isAdmin ? '/api/admin/stats' : null,
-    fetcher
-  )
+
+  const stats = isAdmin ? MOCK_STATS : undefined
+  const statsLoading = false
 
   if (authLoading) {
     return (

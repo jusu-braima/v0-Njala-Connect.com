@@ -70,7 +70,7 @@ export default function ProfilePage() {
               <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center mb-4 overflow-hidden animate-bounce-in ring-4 ring-primary/20">
                 <ProfileAvatar 
                   name={profile.full_name || undefined} 
-                  image={profile.avatar_url ? `/api/file?pathname=${encodeURIComponent(profile.avatar_url)}` : undefined} 
+                  image={profile.avatar_url || undefined} 
                   size="xl" 
                 />
               </div>

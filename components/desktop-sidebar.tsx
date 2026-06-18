@@ -59,7 +59,7 @@ export function DesktopSidebar({ notificationCount = 0 }: DesktopSidebarProps) {
 
   const handleLogout = async () => {
     await logout()
-    router.push('/auth/login')
+    router.push('/login')
   }
 
   const containerVariants = {
