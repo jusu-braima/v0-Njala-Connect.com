@@ -60,7 +60,7 @@ import {
 import { toast } from 'sonner'
 
 export default function AdminComplaintsPage() {
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, isAdmin } = useAuth()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -120,7 +120,7 @@ export default function AdminComplaintsPage() {
   }
 
   // Check if user is admin
-  if (user?.role !== 'admin') {
+  if (!isAdmin) {
     return (
       <div className="min-h-screen bg-background pb-20">
         <DashboardHeader notificationCount={8} />

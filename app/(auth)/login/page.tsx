@@ -13,6 +13,12 @@ import { Eye, EyeOff, ArrowLeft, Mail, Lock, Sparkles, ShieldCheck } from 'lucid
 import { useAuth } from '@/lib/auth-context'
 import { motion } from 'framer-motion'
 
+const demoAccounts = [
+  { label: 'Student', email: 'student@njala.edu.sl', password: 'student123', canPost: false },
+  { label: 'Lecturer', email: 'lecturer@njala.edu.sl', password: 'lecturer123', canPost: true },
+  { label: 'Admin', email: 'admin@njala.edu.sl', password: 'admin123', canPost: true },
+]
+
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -266,6 +272,36 @@ export default function LoginPage() {
             </p>
           </motion.div>
 
+          {/* Demo accounts - tap to autofill */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            className="rounded-xl border border-border/60 bg-muted/40 p-4"
+          >
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3 text-center">
+              Demo accounts — tap to fill
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {demoAccounts.map((acc) => (
+                <button
+                  key={acc.email}
+                  type="button"
+                  onClick={() => {
+                    setEmail(acc.email)
+                    setPassword(acc.password)
+                    setError('')
+                  }}
+                  className="flex flex-col items-center gap-1 rounded-lg border border-border/60 bg-background px-2 py-3 text-center transition-all duration-200 hover:border-primary/50 hover:shadow-md"
+                >
+                  <span className="text-sm font-bold text-foreground">{acc.label}</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {acc.canPost ? 'Can post' : 'View only'}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </motion.div>
 
         </motion.div>
       </div>

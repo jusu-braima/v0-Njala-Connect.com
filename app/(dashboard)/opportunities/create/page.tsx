@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useAuth } from '@/lib/auth-context'
+import { AccessDenied } from '@/components/access-denied'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { opportunityCategories } from '@/lib/data'
@@ -29,7 +30,7 @@ import {
 } from 'lucide-react'
 
 export default function CreateOpportunityPage() {
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, canPost } = useAuth()
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -52,9 +53,6 @@ export default function CreateOpportunityPage() {
       router.push('/login')
     }
   }, [isAuthenticated, router])
-
-  // Check if user is admin
-  const isAdmin = user?.role === 'admin'
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -103,24 +101,8 @@ export default function CreateOpportunityPage() {
     return null
   }
 
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen bg-background pb-20">
-        <DashboardHeader notificationCount={8} />
-        <main className="px-4 py-6 max-w-lg mx-auto">
-          <div className="text-center py-12">
-            <h1 className="text-lg font-semibold">Access Denied</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Only administrators can create opportunities.
-            </p>
-            <Button className="mt-4" onClick={() => router.push('/opportunities')}>
-              Back to Opportunities
-            </Button>
-          </div>
-        </main>
-        <BottomNav notificationCount={8} />
-      </div>
-    )
+  if (!canPost) {
+    return <AccessDenied backHref="/opportunities" backLabel="Back to Opportunities" />
   }
 
   if (showSuccess) {

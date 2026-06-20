@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
-export type UserRole = 'student' | 'staff' | 'admin'
+export type UserRole = 'student' | 'lecturer' | 'admin'
 
 export interface Profile {
   id: string
@@ -34,6 +34,8 @@ interface AuthContextType {
   isLoading: boolean
   isAdmin: boolean
   isStaff: boolean
+  /** Admins and lecturers can publish content; students cannot. */
+  canPost: boolean
   login: (email: string, password: string) => Promise<boolean>
   logout: () => void
   refreshProfile: () => void
@@ -58,18 +60,18 @@ const MOCK_USERS: Record<string, { password: string; profile: Profile }> = {
       updated_at: new Date().toISOString(),
     }
   },
-  'staff@njala.edu.sl': {
-    password: 'staff123',
+  'lecturer@njala.edu.sl': {
+    password: 'lecturer123',
     profile: {
-      id: 'mock-staff-id',
-      email: 'staff@njala.edu.sl',
-      full_name: 'Jane Staff',
+      id: 'mock-lecturer-id',
+      email: 'lecturer@njala.edu.sl',
+      full_name: 'Dr. Aminata Sesay',
       student_id: null,
-      department: 'Administration',
-      role: 'staff',
+      department: 'Department of Computer Science',
+      role: 'lecturer',
       avatar_url: null,
       phone: '+232 76 654321',
-      bio: 'Staff member at Njala University.',
+      bio: 'Lecturer in the Department of Computer Science at Njala University.',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     }
@@ -172,7 +174,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const isAdmin = profile?.role === 'admin'
-  const isStaff = profile?.role === 'staff' || profile?.role === 'admin'
+  const isStaff = profile?.role === 'lecturer' || profile?.role === 'admin'
+  // Only admins and lecturers may publish content. Students are read-only
+  // (aside from filing complaints).
+  const canPost = profile?.role === 'admin' || profile?.role === 'lecturer'
 
   return (
     <AuthContext.Provider
@@ -183,6 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading,
         isAdmin,
         isStaff,
+        canPost,
         login,
         logout,
         refreshProfile,

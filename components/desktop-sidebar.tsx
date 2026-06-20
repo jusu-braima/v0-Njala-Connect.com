@@ -19,7 +19,8 @@ import {
   LogOut,
   Shield,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  PenSquare
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Logo } from '@/components/logo'
@@ -55,7 +56,7 @@ interface DesktopSidebarProps {
 export function DesktopSidebar({ notificationCount = 0 }: DesktopSidebarProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const { profile, isAdmin, logout } = useAuth()
+  const { profile, isAdmin, canPost, logout } = useAuth()
 
   const handleLogout = async () => {
     await logout()
@@ -194,6 +195,43 @@ export function DesktopSidebar({ notificationCount = 0 }: DesktopSidebarProps) {
         </motion.div>
 
         <Separator className="my-4 bg-border/50" />
+
+        {/* Create Post - admins & lecturers only */}
+        {canPost && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.45 }}
+          >
+            <Link href="/create">
+              <div
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 mb-4 group relative overflow-hidden',
+                  pathname.startsWith('/create')
+                    ? 'bg-gradient-to-r from-primary to-emerald-600 text-white shadow-lg shadow-primary/20'
+                    : 'text-muted-foreground hover:bg-primary/5 hover:text-primary'
+                )}
+              >
+                <div className={cn(
+                  'flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-300',
+                  pathname.startsWith('/create')
+                    ? 'bg-white/20'
+                    : 'bg-primary/10 group-hover:bg-primary/20'
+                )}>
+                  <PenSquare className={cn(
+                    'w-4 h-4',
+                    pathname.startsWith('/create') ? 'text-white' : 'text-primary'
+                  )} />
+                </div>
+                <span>Create Post</span>
+                <Sparkles className={cn(
+                  'w-4 h-4 ml-auto',
+                  pathname.startsWith('/create') ? 'text-white' : 'text-primary'
+                )} />
+              </div>
+            </Link>
+          </motion.div>
+        )}
 
         {/* Admin Link */}
         {isAdmin && (

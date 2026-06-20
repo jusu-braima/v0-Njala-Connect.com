@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useAuth } from '@/lib/auth-context'
+import { AccessDenied } from '@/components/access-denied'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { eventCategories } from '@/lib/data'
@@ -36,7 +37,7 @@ interface AgendaItem {
 }
 
 export default function CreateEventPage() {
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, canPost } = useAuth()
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -99,6 +100,10 @@ export default function CreateEventPage() {
 
   if (!isAuthenticated) {
     return null
+  }
+
+  if (!canPost) {
+    return <AccessDenied />
   }
 
   if (showSuccess) {

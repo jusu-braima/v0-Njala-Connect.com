@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useAuth } from '@/lib/auth-context'
+import { AccessDenied } from '@/components/access-denied'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { lostFoundCategories } from '@/lib/data'
 import { LostFoundCategory } from '@/lib/types'
@@ -31,7 +32,7 @@ import { cn } from '@/lib/utils'
 const MAX_DESCRIPTION_LENGTH = 500
 
 function ReportItemForm() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, canPost } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
   
@@ -80,6 +81,10 @@ function ReportItemForm() {
 
   if (!isAuthenticated) {
     return null
+  }
+
+  if (!canPost) {
+    return <AccessDenied backHref="/lost-found" backLabel="Back to Lost & Found" />
   }
 
   return (

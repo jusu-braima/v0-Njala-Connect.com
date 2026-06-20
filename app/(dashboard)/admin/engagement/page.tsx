@@ -34,7 +34,7 @@ import {
 } from 'lucide-react'
 
 export default function AdminEngagementPage() {
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, isAdmin } = useAuth()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState('overview')
 
@@ -81,9 +81,6 @@ export default function AdminEngagementPage() {
       .sort((a, b) => b.memberCount - a.memberCount)
       .slice(0, 5)
   }, [])
-
-  // Check if user is admin
-  const isAdmin = user?.role === 'admin'
 
   if (!isAuthenticated) {
     return null

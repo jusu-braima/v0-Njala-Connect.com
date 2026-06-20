@@ -19,7 +19,7 @@ import {
 } from 'lucide-react'
 
 export default function LostFoundPage() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, canPost } = useAuth()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<'lost' | 'found'>('lost')
 
@@ -48,11 +48,15 @@ export default function LostFoundPage() {
             </Button>
           </Link>
           <h1 className="text-lg font-semibold text-white">Lost & Found</h1>
-          <Link href={`/lost-found/report?type=${activeTab}`}>
-            <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
-              <Plus className="w-5 h-5" />
-            </Button>
-          </Link>
+          {canPost ? (
+            <Link href={`/lost-found/report?type=${activeTab}`}>
+              <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                <Plus className="w-5 h-5" />
+              </Button>
+            </Link>
+          ) : (
+            <span className="w-10" />
+          )}
         </div>
       </header>
 
@@ -95,10 +99,10 @@ export default function LostFoundPage() {
             description={activeTab === 'lost' 
               ? "No lost items have been reported yet."
               : "No found items have been reported yet."}
-            action={{
+            action={canPost ? {
               label: `Report ${activeTab === 'lost' ? 'Lost' : 'Found'} Item`,
               onClick: () => router.push(`/lost-found/report?type=${activeTab}`)
-            }}
+            } : undefined}
           />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3">

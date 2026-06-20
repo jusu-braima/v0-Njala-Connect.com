@@ -37,7 +37,7 @@ import {
 } from 'lucide-react'
 
 export default function AdminLostFoundPage() {
-  const { isAuthenticated, user } = useAuth()
+  const { isAuthenticated, isAdmin } = useAuth()
   const router = useRouter()
   const [searchQuery, setSearchQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
@@ -83,7 +83,7 @@ export default function AdminLostFoundPage() {
     return null
   }
 
-  if (user?.role !== 'admin') {
+  if (!isAdmin) {
     return (
       <div className="min-h-screen bg-background pb-20">
         <DashboardHeader notificationCount={8} />
